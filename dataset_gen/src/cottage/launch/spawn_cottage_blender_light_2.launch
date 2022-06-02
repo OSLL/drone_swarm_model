@@ -1,0 +1,5 @@
+<launch>
+  <param name="cottage_blender_light_2_description" command="$(find xacro)/xacro --inorder '$(find cottage)/urdf/cottage_blender_light_2.urdf.xacro'" />
+
+  <node name="spawn_cottage_blender_light_2" pkg="gazebo_ros" type="spawn_model" args="-param cottage_blender_light_2_description -urdf -model cottage_blender_light_2" respawn="false" />
+</launch>

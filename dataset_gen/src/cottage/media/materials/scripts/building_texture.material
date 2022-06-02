@@ -1,0 +1,11 @@
+material building_texture {
+    receive_shadows on
+    technique {
+        pass {
+            texture_unit {
+                texture building_texture.png
+            }
+        }
+    }
+}
+

@@ -1,0 +1,21 @@
+material cottage_texture {
+    receive_shadows on
+    technique {
+        pass {
+            texture_unit {
+                texture cottage_diffuse.png
+            }
+        }
+    }
+}
+
+material grass {
+    receive_shadows on
+    technique {
+        pass {
+            texture_unit {
+                texture aerial_grass_rock.jpg
+            }
+        }
+    }
+}

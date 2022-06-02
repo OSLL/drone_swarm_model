@@ -1,0 +1,10 @@
+<launch>
+  <arg name="model_name" default="drone1" />
+
+  <!-- Convert xacro and put on parameter server -->
+  <param name="robot_description" command="$(find xacro)/xacro $(find camera_controls)/urdf/camera.urdf.xacro" />
+
+  <!-- Spawn a robot into Gazebo -->
+  <node name="spawn_camera" pkg="gazebo_ros" type="spawn_model" args="-param robot_description -urdf -model $(arg model_name)" />
+  <node name="camera_repeater" pkg="camera_controls" type="repeater.py" args="/$(arg model_name)/camera/image_raw /$(arg model_name)/camera/image_raw/r" />
+</launch>

@@ -1,0 +1,55 @@
+
+<launch>
+    
+    <arg name="use_sim_time" default="true" />
+    <arg name="gui" default="false" />
+    <arg name="headless" default="true" />
+    <arg name="world_name" default="$(find cottage)/worlds/actually_empty_world.world" />
+
+    
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="debug" value="0" />
+    <arg name="gui" value="$(arg gui)" />
+    <arg name="use_sim_time" value="$(arg use_sim_time)" />
+    <arg name="headless" value="$(arg headless)" />
+    <arg name="world_name" value="$(arg world_name)" />
+    </include>
+
+    
+    <include file="$(find cottage)/launch/spawn_cottage_blender_ground.launch" />
+
+    
+    <include file="$(find cottage)/launch/spawn_cottage_blender_Cube.launch">
+        
+    </include>
+    
+    
+        <group ns="drone1">
+            <include file="$(find camera_controls)/launch/spawn_camera.launch">
+            <arg name="model_name" value="drone1" />
+            </include>
+        </group>
+        
+
+        <group ns="drone2">
+            <include file="$(find camera_controls)/launch/spawn_camera.launch">
+            <arg name="model_name" value="drone2" />
+            </include>
+        </group>
+        
+
+        <group ns="drone3">
+            <include file="$(find camera_controls)/launch/spawn_camera.launch">
+            <arg name="model_name" value="drone3" />
+            </include>
+        </group>
+        
+
+        <group ns="drone4">
+            <include file="$(find camera_controls)/launch/spawn_camera.launch">
+            <arg name="model_name" value="drone4" />
+            </include>
+        </group>
+        
+</launch>
+
