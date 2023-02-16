@@ -1,0 +1,15 @@
+version: "3"
+
+services:
+  generator:
+    build: .
+    container_name: dataset_gen
+    command: rosmaster
+    environment:
+      - DISPLAY=$DISPLAY
+      - QT_X11_NO_MITSHM=1
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ./src:/catkin_ws/src:rw
+    devices:
+      - /dev/dri:/dev/dri

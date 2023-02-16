@@ -3,8 +3,7 @@
 ## Запуск Docker-контейнера
 Сборка образа и запуск контейнера
 ```bash
-cd dataset_gen
-./scripts/build_and_start_docker.sh
+docker-compose up --build
 ```
 
 ## Использование
@@ -16,6 +15,11 @@ rosrun cottage configure_launch.py --num N > new_file.launch
 ```
 
 ### Запуск тестовой симуляции
+Подключитесь к терминалу контейнера с помощью команды
+```bash
+docker exec -it dataset_gen /bin/bash
+```
+Примеры команд:
 ```bash
 roslaunch cottage cottage_blender.launch
 # or
