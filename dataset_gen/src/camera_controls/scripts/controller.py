@@ -18,7 +18,7 @@ def my_is_digit(string):
 
 if __name__ == '__main__':
     try:
-        pub = rospy.Publisher('drivercontroller', String)
+        pub = rospy.Publisher('drivercontroller', String, queue_size=1)
         rospy.init_node('dronecontroller')
         while not rospy.is_shutdown():
             command = input()
