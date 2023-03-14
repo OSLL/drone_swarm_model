@@ -33,10 +33,9 @@ if __name__ == '__main__':
                 if command_list[0] == 'move' and len(command_list) == 5 and all(my_is_digit(x) for x in command_list[2:]) or \
                         command_list[0] == 'rotate' and len(command_list) == 5 and all(my_is_digit(x) for x in command_list[2:]) or \
                         command_list[0] == 'translate' and len(command_list) == 8 and all(my_is_digit(x) for x in command_list[2:]):
-                    zero = [0, 0, 0, 0, 0, 0]
                     commands = [float(i) for i in command_list[2:]]
-                    commands.extend([0, ] * (len(zero) - len(commands)))
-                    x, y, z, yaw, pitch, roll = list(map(sum, zip(zero, commands)))
+                    commands.extend([float(0), ] * (6 - len(commands)))
+                    x, y, z, yaw, pitch, roll = commands
                     pub.publish(x, y, z, yaw, pitch, roll)
                 else:
                     print("Check arguments!")
