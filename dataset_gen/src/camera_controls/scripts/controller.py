@@ -3,6 +3,7 @@ import sys
 import rospy
 import roslib
 from std_msgs.msg import String
+from camera_controls.msg import data
 
 
 def my_is_digit(string):
@@ -18,7 +19,7 @@ def my_is_digit(string):
 
 if __name__ == '__main__':
     try:
-        pub = rospy.Publisher('drivercontroller', String, queue_size=1)
+        pub = rospy.Publisher('drivercontroller', data, queue_size=1)
         rospy.init_node('dronecontroller')
         while not rospy.is_shutdown():
             command = input()
@@ -32,7 +33,11 @@ if __name__ == '__main__':
                 if command_list[0] == 'move' and len(command_list) == 5 and all(my_is_digit(x) for x in command_list[2:]) or \
                         command_list[0] == 'rotate' and len(command_list) == 5 and all(my_is_digit(x) for x in command_list[2:]) or \
                         command_list[0] == 'translate' and len(command_list) == 8 and all(my_is_digit(x) for x in command_list[2:]):
-                    pub.publish(command)
+                    zero = [0, 0, 0, 0, 0, 0]
+                    commands = [float(i) for i in command_list[2:]]
+                    commands.extend([0, ] * (len(zero) - len(commands)))
+                    x, y, z, yaw, pitch, roll = list(map(sum, zip(zero, commands)))
+                    pub.publish(x, y, z, yaw, pitch, roll)
                 else:
                     print("Check arguments!")
     except rospy.ROSInterruptException:
