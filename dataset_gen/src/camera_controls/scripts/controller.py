@@ -19,7 +19,6 @@ def my_is_digit(string):
 
 if __name__ == '__main__':
     try:
-        pub = rospy.Publisher('drivercontroller', msg_transposition, queue_size=1)
         rospy.init_node('dronecontroller')
         while not rospy.is_shutdown():
             command = input()
@@ -39,6 +38,8 @@ if __name__ == '__main__':
                     elif command_list[0] == 'rotate':
                         commands = [float(0), ] * 3 + commands
                     x, y, z, roll, pitch, yaw = commands
+                    topic_name = command_list[1] + "_driver"
+                    pub = rospy.Publisher(topic_name, msg_transposition, queue_size=1)
                     pub.publish(x, y, z, roll, pitch, yaw)
                 else:
                     print("Check arguments!")
