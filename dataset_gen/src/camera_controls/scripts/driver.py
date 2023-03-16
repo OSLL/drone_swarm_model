@@ -8,52 +8,55 @@ from gazebo_msgs.msg import ModelState
 from geometry_msgs.msg import Quaternion, Point
 from gazebo_msgs.srv import SetModelState, GetModelState
 
-# Функция обработки сообщений
-def callback(data):
-    #rospy.loginfo(
-     #   f"\nx = {data.x},\ny = {data.y},\nz = {data.z},\nroll = {data.roll},\npitch = {data.pitch}, \nyaw = {data.yaw}")
-    # Получение текущей позиции и ориентации дрона в глобальной системе координат
-    rec_pos, rec_dir = get_drone_location('drone1')
-
-    # Преобразование координат, data -- локальные значения, rec_pos/rec_dir -- глобальные
-    data = coordinate_transformation(data, rec_pos, rec_dir)
-    # Телепортация дрона
-    teleport_drone(data)
-
 # Поворот вектора через кватернион
 def qv_mult(q1, v1):
-    q2 = [v1.x, v1.y, v1.z, 0]
+    q2 = [v1[0], v1[1], v1[2], 0]
     q1 = [q1.x, q1.y, q1.z, q1.w]
 
     return quaternion_multiply(
         quaternion_multiply(q1, q2),
         quaternion_conjugate(q1)
-    )[:3]
+    )[0:3]
 
-# Преобразование координат и углов. rec_dir -- кватернион
-def coordinate_transformation(data, rec_pos, rec_dir):
+# Умножение кватернионов друг на друга
+def qq_mult(q1,q2):
+    q1 = [q1.x , q1.y , q1.z , q1.w]
+    q2 = [q2.x , q2.y , q2.z , q2.w]
+    return quaternion_multiply(q1, q2)
+
+# Функция обработки сообщений
+def callback(data):
+    robot_pos, robot_dir = get_drone_location('drone1')
+    # Преобразование координат, data -- локальные значения, robot_pos/robot_dir -- глобальные
+    data = coordinate_transformation(data, robot_pos, robot_dir)
+    # Телепортация дрона
+    teleport_drone(data)
+
+# Преобразование координат и углов
+def coordinate_transformation(data, robot_pos, robot_dir):
     # Локальные координаты робота
-    robot_pos = [data.x, data.y, data.z]
+    rec_pos = [data.x, data.y, data.z]
     # Локальный кватернион
-    robot_dir = Quaternion(*quaternion_from_euler(data.roll, data.pitch, data.yaw))
+    rec_dir = Quaternion(*quaternion_from_euler(data.roll, data.pitch, data.yaw))
 
     # Поворот вектора rec_pos на кватернион robot_dir
     delta_pos = qv_mult(robot_dir, rec_pos)
-    # Результирующее положение робота
-    robot_pos = list(map(sum, zip(delta_pos,robot_pos)))
-    # Результирующие углы
-    robot_dir.x += rec_dir.x
-    robot_dir.y += rec_dir.y
-    robot_dir.z += rec_dir.z
-    robot_dir.w += rec_dir.w
 
-    data.x = robot_pos[0]
-    data.y = robot_pos[1]
-    data.z = robot_pos[2]
-    data.roll, data.pitch, data.yaw = euler_from_quaternion([robot_dir.x,
-                                                             robot_dir.y,
-                                                             robot_dir.z,
-                                                             robot_dir.w])
+    # Результирующее положение робота
+    robot_pos.x += delta_pos[0]
+    robot_pos.y += delta_pos[1]
+    robot_pos.z += delta_pos[2]
+    
+    # Результирующие углы
+    robot_dir = qq_mult(rec_dir, robot_dir)
+
+    data.x = robot_pos.x
+    data.y = robot_pos.y
+    data.z = robot_pos.z
+    data.roll, data.pitch, data.yaw = euler_from_quaternion([robot_dir[0],
+                                                             robot_dir[1],
+                                                             robot_dir[2],
+                                                             robot_dir[3]])
     return data
 
 # Получить текущее положение робота до начала перемещения
