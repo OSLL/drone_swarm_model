@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import roslib
 import rospy
+import sys
 from std_msgs.msg import String
 from camera_controls.msg import msg_transposition
 from tf.transformations import quaternion_from_euler, euler_from_quaternion, quaternion_multiply,quaternion_conjugate, unit_vector
@@ -25,12 +26,12 @@ def qq_mult(q1,q2):
     return quaternion_multiply(q1, q2)
 
 # Функция обработки сообщений
-def callback(data):
-    robot_pos, robot_dir = get_drone_location('drone1')
+def callback(data, drone_name):
+    robot_pos, robot_dir = get_drone_location(drone_name)
     # Преобразование координат, data -- локальные значения, robot_pos/robot_dir -- глобальные
     data = coordinate_transformation(data, robot_pos, robot_dir)
     # Телепортация дрона
-    teleport_drone(data)
+    teleport_drone(data, drone_name)
 
 # Преобразование координат и углов
 def coordinate_transformation(data, robot_pos, robot_dir):
@@ -60,11 +61,11 @@ def coordinate_transformation(data, robot_pos, robot_dir):
     return data
 
 # Получить текущее положение робота до начала перемещения
-def get_drone_location(name_drone):
+def get_drone_location(drone_name):
     rospy.wait_for_service('gazebo/get_model_state')
     try:
         gms = rospy.ServiceProxy('gazebo/get_model_state', GetModelState)
-        model_state = gms(name_drone, '')
+        model_state = gms(drone_name, '')
         position = model_state.pose.position
         orientation = model_state.pose.orientation
 
@@ -73,12 +74,12 @@ def get_drone_location(name_drone):
         print(f"Service call failed: {e}")
 
 # Телепортация дрона в глобальной системе координат
-def teleport_drone(data):
+def teleport_drone(data, drone_name):
     rospy.wait_for_service('gazebo/set_model_state')
     try:
         sms = rospy.ServiceProxy('gazebo/set_model_state', SetModelState)
         state = ModelState()
-        state.model_name = 'drone1'
+        state.model_name = drone_name
 
         state.pose.position = Point(data.x, data.y, data.z)
 
@@ -89,8 +90,15 @@ def teleport_drone(data):
         print(f"Service call failed: {e}")
 
 def listener():
+    # В дальнейшем имя ноды будет изменено на то, что указано в __name 
     rospy.init_node('driver')
-    rospy.Subscriber('drivercontroller', msg_transposition, callback)
+
+    # Имя дрона без слеша (e.g. 'drone1')
+    drone_name = rospy.get_name()[1:]
+    # Имя топика
+    #print(f'{drone_name}/cmd_move')
+
+    rospy.Subscriber(f'{drone_name}/cmd_move', msg_transposition, callback, drone_name)
     rospy.spin()
 
 if __name__ == "__main__":
