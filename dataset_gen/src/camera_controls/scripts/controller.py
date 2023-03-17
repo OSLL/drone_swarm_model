@@ -85,7 +85,7 @@ if __name__ == '__main__':
                     elif command_list[0] in ['rotate', 'rotate_direct']:
                         commands = [float(0), ] * 3 + commands
                     x, y, z, roll, pitch, yaw = commands
-                    topic_name = command_list[1] + "_driver"
+                    topic_name = command_list[1] + "/cmd_move"
                     pub = rospy.Publisher(topic_name, msg_transposition, queue_size=1)
                     if command_list[0] in ['move_direct', 'rotate_direct', 'translate_direct']:
                         pub.publish(x, y, z, roll, pitch, yaw)
