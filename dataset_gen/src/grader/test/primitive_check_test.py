@@ -22,7 +22,7 @@ wrong_code = [
 
 correct_code = [
     "move drone 0 0 0",
-    "move     drone 1.34 3.14 346\n move    drone 0120 874 1231",
+    "move_direct     drone 1.34 3.14 346\n move    drone 0120 874 1231",
     " rotate \t\t drone 1 2 3.5",
     "translate drone 1 2 3.5  4 5.76 6  "
 ]

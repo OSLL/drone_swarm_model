@@ -8,15 +8,16 @@
 def _primitive_check_line(line : str) -> bool:
     if not line:
         return False
+    commands = ["move", "move_direct", "rotate", "rotate_direct", "translate", "translate_direct"]
     tokens = line.split()
-    if tokens[0] != "move" and tokens[0] != "rotate" and tokens[0] != "translate":
+    if tokens[0] not in commands:
         return False
-    if tokens[0] == "move" and len(tokens) != 5:        # move drone_name x y z
-        return False
-    if tokens[0] == "rotate" and len(tokens) != 5:      # rotate drone_name yaw pitch roll
-        return False
-    if tokens[0] == "translate" and len(tokens) != 8:   # translate drone_name x y z yaw pitch roll
-        return False
+    if (tokens[0] == "move" or tokens[0] == "move_direct") and len(tokens) != 5:
+        return False            # move[_direct] drone_name x y z
+    if (tokens[0] == "rotate" or tokens[0] == "rotate_direct") and len(tokens) != 5:
+        return False            # rotate[_direct] drone_name yaw pitch roll
+    if (tokens[0] == "translate" or tokens[0] == "translate_direct") and len(tokens) != 8:
+        return False            # translate[_direct] drone_name x y z yaw pitch roll
     try:
         all(map(float, tokens[2:]))
         return True
