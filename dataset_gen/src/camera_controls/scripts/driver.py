@@ -11,22 +11,15 @@ from gazebo_msgs.srv import SetModelState, GetModelState
 
 # Поворот вектора через кватернион
 def qv_mult(q1, v1):
-    q2 = [v1[0], v1[1], v1[2], 0]
-    q1 = [q1.x, q1.y, q1.z, q1.w]
+    q2 = v1 + [0]
 
     return quaternion_multiply(
         quaternion_multiply(q1, q2),
         quaternion_conjugate(q1)
     )[0:3]
 
-# Умножение кватернионов друг на друга
-def qq_mult(q1,q2):
-    q1 = [q1.x , q1.y , q1.z , q1.w]
-    q2 = [q2.x , q2.y , q2.z , q2.w]
-    return quaternion_multiply(q1, q2)
-
 # Функция обработки сообщений
-def callback(data, drone_name):
+def cmd_move_event(data, drone_name):
     robot_pos, robot_dir = get_drone_location(drone_name)
     # Преобразование координат, data -- локальные значения, robot_pos/robot_dir -- глобальные
     data = coordinate_transformation(data, robot_pos, robot_dir)
@@ -38,7 +31,7 @@ def coordinate_transformation(data, robot_pos, robot_dir):
     # Локальные координаты робота
     rec_pos = [data.x, data.y, data.z]
     # Локальный кватернион
-    rec_dir = Quaternion(*quaternion_from_euler(data.roll, data.pitch, data.yaw))
+    rec_dir = quaternion_from_euler(data.roll, data.pitch, data.yaw)
 
     # Поворот вектора rec_pos на кватернион robot_dir
     delta_pos = qv_mult(robot_dir, rec_pos)
@@ -49,7 +42,7 @@ def coordinate_transformation(data, robot_pos, robot_dir):
     robot_pos.z += delta_pos[2]
     
     # Результирующие углы
-    robot_dir = qq_mult(rec_dir, robot_dir)
+    robot_dir = quaternion_multiply(rec_dir, robot_dir)
 
     data.x = robot_pos.x
     data.y = robot_pos.y
@@ -67,7 +60,10 @@ def get_drone_location(drone_name):
         gms = rospy.ServiceProxy('gazebo/get_model_state', GetModelState)
         model_state = gms(drone_name, '')
         position = model_state.pose.position
-        orientation = model_state.pose.orientation
+        orientation = [model_state.pose.orientation.x,
+                       model_state.pose.orientation.y,
+                       model_state.pose.orientation.z,
+                       model_state.pose.orientation.w]
 
         return position, orientation
     except rospy.ServiceException as e:
@@ -90,15 +86,13 @@ def teleport_drone(data, drone_name):
         print(f"Service call failed: {e}")
 
 def listener():
-    # В дальнейшем имя ноды будет изменено на то, что указано в __name 
+    # Если не указан параметр __name, то имя ноды по-умолчанию -- 'driver'
     rospy.init_node('driver')
 
     # Имя дрона без слеша (e.g. 'drone1')
     drone_name = rospy.get_name()[1:]
-    # Имя топика
-    #print(f'{drone_name}/cmd_move')
 
-    rospy.Subscriber(f'{drone_name}/cmd_move', msg_transposition, callback, drone_name)
+    rospy.Subscriber(f'{drone_name}/cmd_move', msg_transposition, cmd_move_event, drone_name)
     rospy.spin()
 
 if __name__ == "__main__":
