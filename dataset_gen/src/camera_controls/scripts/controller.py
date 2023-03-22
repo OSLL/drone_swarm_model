@@ -44,7 +44,9 @@ def translation_coor(x, y, z, roll, pitch, yaw, pos, quaternion_global):
     x, y, z = rotate_by_quat(quaternion_global_new, [x, y, z])[:3]
     # расчет координат для текущей
     pos.x, pos.y, pos.z = rotate_by_quat(quaternion_global_in, [pos.x, pos.y, pos.z])[:3]
-    return x - pos.x, y - pos.y, z - pos.z, roll, pitch, yaw
+    # перевод глобальных в эйлеры
+    roll_global, pitch_global, yaw_global = euler_from_quaternion(quaternion_global)
+    return x - pos.x, y - pos.y, z - pos.z, roll - roll_global, pitch - pitch_global, yaw - yaw_global
 
 
 if __name__ == '__main__':
