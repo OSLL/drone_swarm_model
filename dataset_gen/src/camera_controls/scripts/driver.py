@@ -9,8 +9,8 @@ from gazebo_msgs.msg import ModelState
 from geometry_msgs.msg import Quaternion, Point
 from gazebo_msgs.srv import SetModelState, GetModelState
 
-# Поворот вектора через кватернион
-def qv_mult(q1, v1):
+# Поворот вектора на кватернион
+def rotate_by_quaternion(q1, v1):
     q2 = v1 + [0]
 
     return quaternion_multiply(
@@ -34,7 +34,7 @@ def coordinate_transformation(data, robot_pos, robot_dir):
     rec_dir = quaternion_from_euler(data.roll, data.pitch, data.yaw)
 
     # Поворот вектора rec_pos на кватернион robot_dir
-    delta_pos = qv_mult(robot_dir, rec_pos)
+    delta_pos = rotate_by_quaternion(robot_dir, rec_pos)
 
     # Результирующее положение робота
     robot_pos.x += delta_pos[0]
