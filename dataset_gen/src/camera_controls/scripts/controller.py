@@ -34,19 +34,21 @@ def rotate_by_quat(q1, v1):
 def translation_coor(x, y, z, roll, pitch, yaw, pos, quaternion_global):
     # глобальные координаты pos quaternion_global тут кватернионы
     # глобальные координаты введенные x y z roll pitch yaw тут эйлеры
-    # кватернион из глобальных введенных
-    quaternion_global_in = quaternion_from_euler(roll, pitch, yaw)
     # преобразование в список
     quaternion_global = [quaternion_global.x, quaternion_global.y, quaternion_global.z, quaternion_global.w]
+    # перевод глобальных в эйлеры
+    roll_global, pitch_global, yaw_global = euler_from_quaternion(quaternion_global)
+    # расчет локального поворота
+    roll_local, pitch_local, yaw_local = roll - roll_global, pitch - pitch_global, yaw - yaw_global
+    # кватернион из локальных
+    quaternion_global_in = quaternion_from_euler(roll_local, pitch_local, yaw_local)
     # поворот, который говорит поворот осей
     quaternion_global_new = quaternion_multiply(quaternion_global, quaternion_global_in)
     # расчет координат для новых
     x, y, z = rotate_by_quat(quaternion_global_new, [x, y, z])[:3]
     # расчет координат для текущей
-    pos.x, pos.y, pos.z = rotate_by_quat(quaternion_global_in, [pos.x, pos.y, pos.z])[:3]
-    # перевод глобальных в эйлеры
-    roll_global, pitch_global, yaw_global = euler_from_quaternion(quaternion_global)
-    return x - pos.x, y - pos.y, z - pos.z, roll - roll_global, pitch - pitch_global, yaw - yaw_global
+    pos.x, pos.y, pos.z = rotate_by_quat(quaternion_global_new, [pos.x, pos.y, pos.z])[:3]
+    return x - pos.x, y - pos.y, z - pos.z, roll_local, pitch_local, yaw_local
 
 
 if __name__ == '__main__':
