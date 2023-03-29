@@ -51,6 +51,30 @@ def translation_coor(x, y, z, roll, pitch, yaw, pos, quaternion_global):
     return x - pos.x, y - pos.y, z - pos.z, roll_local, pitch_local, yaw_local
 
 
+def move():
+    pass
+
+
+def move_direct():
+    pass
+
+
+def rotate():
+    pass
+
+
+def rotate_direct():
+    pass
+
+
+def translate():
+    pass
+
+
+def translate_direct():
+    pass
+
+
 if __name__ == '__main__':
     try:
         rospy.init_node('dronecontroller')
