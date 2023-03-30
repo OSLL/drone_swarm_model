@@ -51,28 +51,55 @@ def translation_coor(x, y, z, roll, pitch, yaw, pos, quaternion_global):
     return x - pos.x, y - pos.y, z - pos.z, roll_local, pitch_local, yaw_local
 
 
-def move():
-    pass
+class Handler:
+    commands = {}
+
+    def run_command(self, name, *args):
+        try:
+            return Handler.commands[name]["func"](self, *args)
+        except KeyError as e:
+            raise AttributeError(f"Wrong command! - {name}")
 
 
-def move_direct():
-    pass
+def command(description):
+    def __command_wrapper(func):
+        name = func.__name__
+        Handler.commands[name] = {
+            "func": func,
+            "description": description
+        }
+        return func
+    return __command_wrapper
 
 
-def rotate():
-    pass
+class GlobalStorage(Handler):
+    @command("move drone to x y z in global coordinates")
+    def move(self, x, y, z):
+        pass
 
+    @command("move drone to x y z in local coordinates")
+    def move_direct(self, x, y, z):
+        pass
 
-def rotate_direct():
-    pass
+    @command("rotate drone by roll pitch yaw in global coordinates")
+    def rotate(self, roll, pitch, yaw):
+        pass
 
+    @command("rotate drone by roll pitch yaw in local coordinates")
+    def rotate_direct(self, roll, pitch, yaw):
+        pass
 
-def translate():
-    pass
+    @command("move drone to x y z and rotate drone by roll pitch yaw in global coordinates")
+    def translate(self, x, y, z, roll, pitch, yaw):
+        pass
 
+    @command("move drone to x y z and rotate drone by roll pitch yaw in local coordinates")
+    def translate_direct(self, x, y, z, roll, pitch, yaw):
+        pass
 
-def translate_direct():
-    pass
+    @command("prints help")
+    def help(self):
+        pass
 
 
 if __name__ == '__main__':
