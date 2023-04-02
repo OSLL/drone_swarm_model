@@ -60,6 +60,7 @@ class Handler:
             self.topic_name = topic + "/cmd_move"
             return self.commands[name]["func"](self, *args)
         except KeyError as e:
+            GlobalStorage.help()
             raise AttributeError(f"Wrong command! - {name}")
 
     def publish(self, x, y, z, roll, pitch, yaw):
@@ -111,7 +112,8 @@ class GlobalStorage(Handler):
 
     @command("prints help")
     def help(self):
-        pass
+        for command in self.commands:
+            print(f"{command}: {self.commands[command]['description']}")
 
 
 if __name__ == '__main__':
@@ -127,6 +129,7 @@ if __name__ == '__main__':
                 try:
                     global_storage.run_command(c, args[0], *map(float, args[1:]))
                 except (AttributeError, TypeError, ValueError, IndexError) as e:
-                    print(e)
+                    print("Check commands!")
+                    global_storage.help()
     except rospy.ROSInterruptException:
         pass
