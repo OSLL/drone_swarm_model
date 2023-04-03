@@ -9,10 +9,6 @@ from gazebo_msgs.srv import GetModelState
 from tf.transformations import euler_from_quaternion, quaternion_from_euler, quaternion_multiply, quaternion_conjugate
 
 
-def is_number(string):
-    return re.fullmatch(r'[-+]?\d+(\.\d+)?(e[+-]\d+)?', string)
-
-
 def odometry_client(model_name):
     odom = '/gazebo/get_model_state'
     rospy.wait_for_service(odom)
@@ -60,8 +56,8 @@ class Handler:
             self.topic_name = topic + "/cmd_move"
             return self.commands[name]["func"](self, *args)
         except KeyError as e:
-            GlobalStorage.help()
-            raise AttributeError(f"Wrong command! - {name}")
+            print(f"Wrong command! - {name}")
+            raise AttributeError
 
     def publish(self, x, y, z, roll, pitch, yaw):
         pub = rospy.Publisher(self.topic_name, msg_transposition, queue_size=1)
