@@ -1,5 +1,5 @@
 <robot name="robot">
-  <link name="cottage_blender_light_3_link">
+  <link name="cottage_blender_ground_link">
     <inertial>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <mass value="1" />
@@ -8,16 +8,20 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="package://cottage/meshes/cottage_blender_light_3.dae" />
+        <mesh filename="package://simulation/meshes/cottage_blender_ground.dae" />
       </geometry>
     </visual>
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="package://cottage/meshes/cottage_blender_light_3.dae" />
+        <mesh filename="package://simulation/meshes/cottage_blender_ground.dae" />
       </geometry>
     </collision>
-  </link>  
+  </link>
+  
+  <gazebo reference="cottage_blender_ground_link">
+    <material>grass</material>
+  </gazebo>
 
   <gazebo> <static>true</static></gazebo>
 </robot>

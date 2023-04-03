@@ -4,7 +4,7 @@
     <arg name="use_sim_time" default="true" />
     <arg name="gui" default="true" />
     <arg name="headless" default="false" />
-    <arg name="world_name" default="$(find cottage)/worlds/actually_empty_world.world" />
+    <arg name="world_name" default="$(find simulation)/worlds/actually_empty_world.world" />
 
     
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
@@ -16,10 +16,10 @@
     </include>
 
     
-    <include file="$(find cottage)/launch/spawn_cottage_blender_ground.launch" />
+    <include file="$(find simulation)/launch/spawn_cottage_blender_ground.launch" />
 
     
-    <include file="$(find cottage)/launch/spawn_cottage_blender_Cube.launch">
+    <include file="$(find simulation)/launch/spawn_cottage_blender_Cube.launch">
         
     </include>
     
