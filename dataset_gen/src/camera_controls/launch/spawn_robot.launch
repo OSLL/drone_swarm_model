@@ -1,0 +1,30 @@
+<launch>
+  <arg name="model_name" default="drone.urdf.xacro"/>
+  <arg name="robot_name" default="drone"/>
+  <arg name="x" default="10"/>
+  <arg name="y" default="10"/>
+  <arg name="z" default="10"/>
+  <arg name="yaw" default="0.0"/>
+  <arg name="pitch" default="0.0"/>
+  <arg name="roll" default="0.0"/>
+
+
+  <!-- Convert xacro and put on parameter server -->
+  <param name="robot_description" command="$(find xacro)/xacro $(find camera_controls)/urdf/$(arg model_name)" />
+
+  <!-- Spawn a robot into Gazebo -->
+  <node name="spawn_robot" pkg="gazebo_ros" type="spawn_model"
+          args="-urdf
+                -param robot_description
+                -model $(arg robot_name)
+                -x $(arg x)
+                -y $(arg y)
+                -z $(arg z)
+                -Y $(arg yaw)
+                -R $(arg pitch)
+                -P $(arg roll)"/>
+</launch>
+
+<!-- Usage:
+    roslaunch camera_controls spawn_robot.launch [args]
+->
