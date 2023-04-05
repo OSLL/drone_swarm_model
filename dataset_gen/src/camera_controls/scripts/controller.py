@@ -9,10 +9,6 @@ from gazebo_msgs.srv import GetModelState
 from tf.transformations import euler_from_quaternion, quaternion_from_euler, quaternion_multiply, quaternion_conjugate
 
 
-def is_number(string):
-    return re.fullmatch(r'[-+]?\d+(\.\d+)?(e[+-]\d+)?', string)
-
-
 def odometry_client(model_name):
     odom = '/gazebo/get_model_state'
     rospy.wait_for_service(odom)
@@ -51,37 +47,85 @@ def translation_coor(x, y, z, roll, pitch, yaw, pos, quaternion_global):
     return x - pos.x, y - pos.y, z - pos.z, roll_local, pitch_local, yaw_local
 
 
+class Handler:
+    commands = {}
+    topic_name = ""
+
+    def run_command(self, name, topic, *args):
+        try:
+            self.topic_name = topic + "/cmd_move"
+            return self.commands[name]["func"](self, *args)
+        except KeyError as e:
+            print(f"Wrong command! - {name}")
+            raise AttributeError
+
+    def publish(self, x, y, z, roll, pitch, yaw):
+        pub = rospy.Publisher(self.topic_name, msg_transposition, queue_size=1)
+        pub.publish(x, y, z, roll, pitch, yaw)
+
+
+def command(description):
+    def __command_wrapper(func):
+        name = func.__name__
+        Handler.commands[name] = {
+            "func": func,
+            "description": description
+        }
+        return func
+    return __command_wrapper
+
+
+class GlobalStorage(Handler):
+    @command("move drone to x y z in global coordinates")
+    def move(self, x, y, z):
+        position, orientation = odometry_client(self.topic_name.split("/")[0])
+        x, y, z, roll, pitch, yaw = translation_coor(x, y, z, 0.0, 0.0, 0.0, position, orientation)
+        self.publish(x, y, z, roll, pitch, yaw)
+
+    @command("move drone to x y z in local coordinates")
+    def move_direct(self, x, y, z):
+        self.publish(x, y, z, 0.0, 0.0, 0.0)
+
+    @command("rotate drone by roll pitch yaw in global coordinates")
+    def rotate(self, roll, pitch, yaw):
+        position, orientation = odometry_client(self.topic_name.split("/")[0])
+        x, y, z, roll, pitch, yaw = translation_coor(0.0, 0.0, 0.0, roll, pitch, yaw, position, orientation)
+        self.publish(x, y, z, roll, pitch, yaw)
+
+    @command("rotate drone by roll pitch yaw in local coordinates")
+    def rotate_direct(self, roll, pitch, yaw):
+        self.publish(0.0, 0.0, 0.0, roll, pitch, yaw)
+
+    @command("move drone to x y z and rotate drone by roll pitch yaw in global coordinates")
+    def translate(self, x, y, z, roll, pitch, yaw):
+        position, orientation = odometry_client(self.topic_name.split("/")[0])
+        x, y, z, roll, pitch, yaw = translation_coor(x, y, z, roll, pitch, yaw, position, orientation)
+        self.publish(x, y, z, roll, pitch, yaw)
+
+    @command("move drone to x y z and rotate drone by roll pitch yaw in local coordinates")
+    def translate_direct(self, x, y, z, roll, pitch, yaw):
+        self.publish(x, y, z, roll, pitch, yaw)
+
+    @command("prints help")
+    def help(self):
+        for command in self.commands:
+            print(f"{command}: {self.commands[command]['description']}")
+
+
 if __name__ == '__main__':
     try:
         rospy.init_node('dronecontroller')
+        global_storage = GlobalStorage()
         while not rospy.is_shutdown():
             command = input()
             if len(command) == 0:
                 continue
-            if command.split(" ")[0] not in ['move', 'move_direct', 'rotate', 'rotate_direct', 'translate', 'translate_direct']:
-                print("Check command!")
             else:
-                command_list = command.split(" ")
-                command_list = list(filter(None, command_list))
-                if command_list[0] in ['move', 'move_direct'] and len(command_list) == 5 and all(is_number(x) for x in command_list[2:]) or \
-                        command_list[0] in ['rotate', 'rotate_direct'] and len(command_list) == 5 and all(is_number(x) for x in command_list[2:]) or \
-                        command_list[0] in ['translate', 'translate_direct'] and len(command_list) == 8 and all(is_number(x) for x in command_list[2:]):
-                    commands = [float(i) for i in command_list[2:]]
-                    if command_list[0] in ['move', 'move_direct']:
-                        commands.extend([float(0), ] * 3)
-                    elif command_list[0] in ['rotate', 'rotate_direct']:
-                        commands = [float(0), ] * 3 + commands
-                    x, y, z, roll, pitch, yaw = commands
-                    topic_name = command_list[1] + "/cmd_move"
-                    pub = rospy.Publisher(topic_name, msg_transposition, queue_size=1)
-                    if command_list[0] in ['move_direct', 'rotate_direct', 'translate_direct']:
-                        pub.publish(x, y, z, roll, pitch, yaw)
-                    else:
-                        model_name = command_list[1]
-                        position, orientation = odometry_client(model_name)
-                        x, y, z, roll, pitch, yaw = translation_coor(x, y, z, roll, pitch, yaw, position, orientation)
-                        pub.publish(x, y, z, roll, pitch, yaw)
-                else:
-                    print("Check arguments!")
+                c, *args = command.split(" ")
+                try:
+                    global_storage.run_command(c, args[0], *map(float, args[1:]))
+                except (AttributeError, TypeError, ValueError, IndexError) as e:
+                    print("Check commands!")
+                    global_storage.help()
     except rospy.ROSInterruptException:
         pass
