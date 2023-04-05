@@ -8,13 +8,13 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="package://cottage/meshes/cottage_blender_light_1.dae" />
+        <mesh filename="package://simulation/meshes/cottage_blender_light_1.dae" />
       </geometry>
     </visual>
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="package://cottage/meshes/cottage_blender_light_1.dae" />
+        <mesh filename="package://simulation/meshes/cottage_blender_light_1.dae" />
       </geometry>
     </collision>
   </link>
