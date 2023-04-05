@@ -8,7 +8,7 @@ def create_args(headless=False):
     <arg name="use_sim_time" default="true" />
     <arg name="gui" default="{gui}" />
     <arg name="headless" default="{headless}" />
-    <arg name="world_name" default="$(find cottage)/worlds/actually_empty_world.world" />
+    <arg name="world_name" default="$(find simulation)/worlds/actually_empty_world.world" />
 """
 
 WORLD_LAUNCH_FILE = """
@@ -22,12 +22,12 @@ WORLD_LAUNCH_FILE = """
 """
 
 GROUND_LAUNCH_FILE = """
-    <include file="$(find cottage)/launch/spawn_cottage_blender_ground.launch" />
+    <include file="$(find simulation)/launch/spawn_cottage_blender_ground.launch" />
 """
 
 def model_file(model=None):
     return f"""
-    <include file="$(find cottage)/launch/spawn_cottage_blender_Cube.launch">
+    <include file="$(find simulation)/launch/spawn_cottage_blender_Cube.launch">
         {f"<arg name='model_filename' value='{model}' />" if model else ''}
     </include>
     """
@@ -49,7 +49,7 @@ def create_drones(num, basename='drone'):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Process some integers.')
     parser.add_argument('--model', default=None,
-                    help='xacro model filename from cottage/urdf dir')
+                    help='xacro model filename from simulation/urdf dir')
     parser.add_argument('--num', default=1, type=int,
                     help='Number of drones in result configuration')
     parser.add_argument('--headless', default=False, type=bool,
