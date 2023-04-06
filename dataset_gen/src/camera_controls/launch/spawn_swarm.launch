@@ -22,7 +22,8 @@
             <arg name="robot_name" value="$(eval arg('robot_name') +'_'+ str(arg('count')))" />
             <arg name="model_name" value="$(arg model_name)"/>
         </include>
-    </group>
+    </group> 
+    
     <!-- Recursively start instance of a node -->
     <include file="$(find camera_controls)/launch/spawn_swarm.launch"    if="$(eval arg('count') - 1 > 0)">
         <arg name="count"        value="$(eval arg('count')-1)"/>
