@@ -1,0 +1,43 @@
+<launch>
+    <arg name="count" default="1"/>
+    <arg name="model_name" default="drone.urdf.xacro"/>
+    <arg name="robot_name" default="drone"/>
+
+    <arg name="x" default="10"/>
+    <arg name="y" default="10"/>
+    <arg name="z" default="10"/>
+    <arg name="yaw" default="0.0"/>
+    <arg name="pitch" default="0.0"/>
+    <arg name="roll" default="0.0"/>
+    <!-- Start Node -->
+    <group   ns="$(eval 'drone' + str(arg('count')))">
+     <param name="tf_prefix" value="$(eval 'drone' + str(arg('count'))+ '_tf')" />
+        <include file="$(find camera_controls)/launch/spawn_robot.launch" >
+            <arg name="x" value="$(arg x)" />
+            <arg name="y" value="$(arg y)" />
+            <arg name="z" value="$(arg z)" />
+            <arg name="yaw" value="$(arg yaw)"/>
+            <arg name="pitch" value="$(arg pitch)"/>
+            <arg name="roll" value="$(arg roll)"/>
+            <arg name="robot_name" value="$(eval arg('robot_name') +'_'+ str(arg('count')))" />
+            <arg name="model_name" value="$(arg model_name)"/>
+        </include>
+    </group>
+
+    <!-- Recursively start instance of a node -->
+    <include file="$(find camera_controls)/launch/spawn_swarm.launch"    if="$(eval arg('count') - 1 > 0)">
+        <arg name="count"        value="$(eval arg('count')-1)"/>
+        <arg name="model_name" value="$(arg model_name)"/>
+        <arg name="robot_name" value="$(arg robot_name)"/>
+        <arg name="x"          value="$(eval arg('x') + 1)" />
+        <arg name="y"          value="$(arg y)" />
+        <arg name="z"          value="$(arg z)" />
+        <arg name="yaw"        value="$(arg yaw)"/>
+        <arg name="pitch"      value="$(arg pitch)"/>
+        <arg name="roll"       value="$(arg roll)"/>
+    </include>
+</launch>
+
+<!-- Usage:
+    roslaunch camera_controls spawn_swarm.launch num:=3 x:=5 y:=8 z:=15
+-->
