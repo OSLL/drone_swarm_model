@@ -21,8 +21,8 @@
                 -y $(arg y)
                 -z $(arg z)
                 -Y $(arg yaw)
-                -R $(arg pitch)
-                -P $(arg roll)"/>
+                -P $(arg pitch)
+                -R $(arg roll)"/>
 </launch>
 
 <!-- Usage:
