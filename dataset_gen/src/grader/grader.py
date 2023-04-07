@@ -1,6 +1,8 @@
 from random import random
 
 from grader_config import dist_grade, metric, pos_coeff, photo_coeff
+from task_config import time_limit, x_range, y_range, z_range, photos
+from task_solution import positions, photos as made_photos, used_time
 
 
 class Point:  # stub
@@ -8,6 +10,13 @@ class Point:  # stub
         self.x = random()
         self.y = random()
         self.z = random()
+
+
+class SolutionReader:  # stub for reading from solution log file
+    def __init__(self, drone, task):
+        self.time = used_time
+        self.photos = made_photos
+        self.positions = positions
 
 
 class Grader:
@@ -72,3 +81,26 @@ class Grader:
         return (used_pos_coeff*self.__grade_position()
                 + used_photo_coeff*self.__grade_photo()) \
             / (used_pos_coeff + used_photo_coeff)
+
+    def __check_borders(self, drone, task):
+        solution = SolutionReader(drone, task)
+        positions = solution.positions
+        x = (min([i[0] for i in positions]), max([i[0] for i in positions]))
+        if x[0] < x_range[0] or x[1] > x_range[1]:
+            return False
+        y = (min([i[1] for i in positions]), max([i[1] for i in positions]))
+        if y[0] < y_range[0] or y[1] > y_range[1]:
+            return False
+        z = (min([i[2] for i in positions]), max([i[2] for i in positions]))
+        if z[0] < z_range[0] or z[1] > z_range[1]:
+            return False
+        return True
+
+    def __check_time(self):
+        solution = SolutionReader(drone, task)
+        return self.solution.time <= time_limit
+
+
+for _ in range(3):
+    grader = Grader(['1', '2', '3'], 1, ["photo", "position"])
+    print(grader.grade())
