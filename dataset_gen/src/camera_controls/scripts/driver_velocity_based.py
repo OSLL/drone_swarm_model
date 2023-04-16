@@ -52,11 +52,11 @@ def is_drone_is_simulation_running(drone_name):
             if drone_name in world_properties.model_names:
                 return True, ''
             else:
-                return False, f'Дрона с именем {drone_name} нет на карте'
+                return False, f'Drone named \'{drone_name}\' is not on the map'
         else:
-            return False, 'Симуляция не запущена'
+            return False, 'Simulation is not running'
     except rospy.ServiceException as e:
-        return False, 'Симуляция не запущена'
+        return False, 'Simulation is not running'
 
 
 # Получить текущее положение робота до начала перемещения
@@ -79,7 +79,7 @@ def get_drone_location(drone_name):
 # Изменение координат робота в соответствии с содержимым msg
 def coordinate_transformation(robot_pos, robot_dir):
     # Величины, на которые изменятся координаты дрона
-    delta_pos = [x/60 for x in [msg.x, msg.y, msg.z]]
+    delta_pos = [x / 60 for x in [msg.x, msg.y, msg.z]]
     # Величины, на которые изменятся углы дрона
     delta_angle = quaternion_from_euler(*[x / 60 for x in [msg.roll, msg.pitch, msg.yaw]])
 
@@ -126,10 +126,13 @@ def listener():
 
     rospy.Subscriber(f'{drone_name}/cmd_vel', msg_transposition, cmd_vel_event, drone_name)
 
+    is_drone_prev = False
     while not rospy.is_shutdown():
         is_drone, err = is_drone_is_simulation_running(drone_name)
         # Если симуляция запущена и дрон с именем drone_name есть на карте, то перемещаем его
         if is_drone:
+            if is_drone and not is_drone_prev:
+                print(f'\'{drone_name}\' driver ready to receive messages')
             try:
                 now = time.time()
                 robot_pos, robot_dir = get_drone_location(drone_name)
@@ -141,6 +144,8 @@ def listener():
                 rospy.signal_shutdown('Done')
         else:
             print(err)
+            time.sleep(1)
+        is_drone_prev = is_drone
 
 
 if __name__ == "__main__":
