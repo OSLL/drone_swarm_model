@@ -14,8 +14,9 @@ from tf.transformations import euler_from_quaternion, quaternion_from_euler, qua
 
 
 class RosbagProcess:
-    def __init__(self, topic_name):
-        self.topic_name = topic_name
+    def __init__(self, drone_name, topics_name):
+        self.drone_name = drone_name
+        self.topics_name = topics_name
         self.process = None
         self.recording_status = False
         self.count = 0
@@ -23,15 +24,17 @@ class RosbagProcess:
     def processing(self, data):
         if data.data == "start record" and not self.recording_status:
             self.recording_status = True
-            command = f"rosbag record -O rosbag{self.count}.bag /{self.topic_name}"
+            command = f"rosbag record -O rosbag{self.count}.bag"
+            for i in range(len(self.topics_name)):
+                command += " /" + self.drone_name + "/" + self.topics_name[i]
             print(command)
             self.process = subprocess.Popen(command, stdin=subprocess.PIPE, shell=True)
-            print("start record ", self.topic_name)
+            print("start record ", *self.topics_name)
         elif data.data == "stop record" and self.recording_status:
             self.recording_status = False
             self.stop_process(self.process)
             self.count += 1
-            print("stop record ", self.topic_name)
+            print("stop record ", *self.topics_name)
 
     def stop_process(self, process):
         cmd = subprocess.Popen(f"ps -o pid --ppid {process.pid} --noheaders", stdout=subprocess.PIPE, shell=True)
@@ -51,7 +54,7 @@ class RosbagProcess:
 
 if __name__ == '__main__':
     try:
-        rosbag = RosbagProcess(sys.argv[1])
+        rosbag = RosbagProcess(sys.argv[1], list(sys.argv[2:]))
         rosbag.listener()
     except (rospy.ROSInterruptException, IndexError):
         print("Check argument!")
