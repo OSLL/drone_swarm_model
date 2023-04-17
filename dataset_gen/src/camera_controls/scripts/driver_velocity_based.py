@@ -13,7 +13,7 @@ from gazebo_msgs.srv import SetModelState, GetModelState, GetWorldProperties
 
 
 # Класс сообщения, которое получает драйвер
-class Message:
+class RobotState:
     # Конструктор
     def __init__(self):
         self.x = 0
@@ -77,7 +77,7 @@ def get_drone_location(drone_name):
 
 
 # Изменение координат робота в соответствии с содержимым msg
-def coordinate_transformation(robot_pos, robot_dir):
+def coordinate_transformation(robot_pos, robot_dir, msg):
     # Величины, на которые изменятся координаты дрона
     delta_pos = [x / 60 for x in [msg.x, msg.y, msg.z]]
     # Величины, на которые изменятся углы дрона
@@ -113,18 +113,20 @@ def teleport_drone(robot_pos, robot_dir, drone_name):
 
 
 # Функция обработки сообщений
-def cmd_vel_event(data, drone_name):
+def cmd_vel_event(data, msg):
     msg.change_values(data)
 
 
 def listener():
+    # Создание экземпляра сообщения
+    msg = RobotState()
     # Если не указан параметр __name, то имя ноды по умолчанию -- 'driver'
     rospy.init_node('driver')
 
     # Имя дрона без слеша (e.g. 'drone1')
     drone_name = rospy.get_name()[1:]
 
-    rospy.Subscriber(f'{drone_name}/cmd_vel', msg_transposition, cmd_vel_event, drone_name)
+    rospy.Subscriber(f'{drone_name}/cmd_vel', msg_transposition, cmd_vel_event, msg)
 
     is_drone_prev = False
     while not rospy.is_shutdown():
@@ -136,7 +138,7 @@ def listener():
             try:
                 now = time.time()
                 robot_pos, robot_dir = get_drone_location(drone_name)
-                robot_pos, robot_dir = coordinate_transformation(robot_pos, robot_dir)
+                robot_pos, robot_dir = coordinate_transformation(robot_pos, robot_dir, msg)
                 teleport_drone(robot_pos, robot_dir, drone_name)
                 delta_time = time.time() - now
                 rospy.sleep(1 / 60 - delta_time)
@@ -150,5 +152,4 @@ def listener():
 
 if __name__ == "__main__":
     # Создание объекта сообщения
-    msg = Message()
     listener()
