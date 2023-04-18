@@ -7,6 +7,7 @@ import os
 import rospy
 import roslib
 import rosbag
+import message_filters
 from std_msgs.msg import String
 from camera_controls.msg import msg_transposition
 from camera_controls.msg import msg_odometry
@@ -22,11 +23,11 @@ class RosbagProcess:
         self.recording_status = False
         self.count = 0
         self.sync_mode = False
-        self.sync_listener_one = None
-        self.sync_listener_two = None
+        self.sync_one = None
+        self.sync_two = None
+        self.sync_listener_both = None
         self.msg_type_one = msg_odometry
         self.msg_type_two = msg_odometry
-        self.data_one = []
         self.special_topic_name = "/rosbag_sync_topic"
 
     def processing(self, data):
@@ -41,30 +42,28 @@ class RosbagProcess:
                 command += f" {self.special_topic_name}"
             print(command)
             self.process = subprocess.Popen(command, stdin=subprocess.PIPE, shell=True)
-            print("start record ", *self.topics_name)
+            print(f"start record {self.drone_name}", *self.topics_name)
         elif data.data == "stop record" and self.recording_status:
             if self.sync_mode:
-                self.sync_listener_one.unregister()
-                self.sync_listener_two.unregister()
+                self.sync_one.unregister()
+                self.sync_two.unregister()
                 self.sync_mode = False
             self.recording_status = False
             self.stop_process(self.process)
             self.count += 1
-            print("stop record ", *self.topics_name)
+            print(f"stop record {self.drone_name}", *self.topics_name)
 
-    def sync_processing_one(self, data):
-        self.data_one = [data.x, data.y, data.z, data.w]
-
-    def sync_processing_two(self, data):
-        if self.data_one:
-            pub = rospy.Publisher(self.special_topic_name, self.msg_type_one, queue_size=1)
-            pub.publish(*self.data_one)
-            pub = rospy.Publisher(self.special_topic_name, self.msg_type_two, queue_size=2)
-            pub.publish(data.x, data.y, data.z, data.w)
+    def sync_processing_both(self, data1, data2):
+        pub = rospy.Publisher(self.special_topic_name, self.msg_type_one, queue_size=1)
+        pub.publish(data1)
+        pub = rospy.Publisher(self.special_topic_name, self.msg_type_two, queue_size=2)
+        pub.publish(data2)
 
     def sync_listener(self):
-        self.sync_listener_one = rospy.Subscriber(f"{self.drone_name}/{self.topics_name[0]}", self.msg_type_one, self.sync_processing_one)
-        self.sync_listener_two = rospy.Subscriber(f"{self.drone_name}/{self.topics_name[1]}", self.msg_type_two, self.sync_processing_two)
+        self.sync_one = message_filters.Subscriber(f"{self.drone_name}/{self.topics_name[0]}", self.msg_type_one)
+        self.sync_two = message_filters.Subscriber(f"{self.drone_name}/{self.topics_name[1]}", self.msg_type_two)
+        self.sync_listener_both = message_filters.ApproximateTimeSynchronizer([self.sync_one, self.sync_two], 10, 1, allow_headerless=True)
+        self.sync_listener_both.registerCallback(self.sync_processing_both)
 
     def stop_process(self, process):
         cmd = subprocess.Popen(f"ps -o pid --ppid {process.pid} --noheaders", stdout=subprocess.PIPE, shell=True)
