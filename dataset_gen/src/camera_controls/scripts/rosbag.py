@@ -4,6 +4,7 @@ import re
 import subprocess
 import signal
 import os
+import time
 import rospy
 import roslib
 import rosbag
@@ -17,9 +18,11 @@ class RosbagProcess:
         self.drone_name = drone_name
         self.topics_name = topics_name
         self.full_topics_name = [f"/{self.drone_name}/{topics_name[i]}" for i in range(len(topics_name))]
+        self.command = f"rosbag record"
         self.process = None
         self.recording_status = False
         self.count = 0
+        self.during = False
         self.sync_mode = False
         self.sync_one = None
         self.sync_two = None
@@ -29,26 +32,42 @@ class RosbagProcess:
 
     def processing(self, data):
         if data.data == "start record" and not self.recording_status:
-            self.recording_status = True
-            command = f"rosbag record -O rosbag{self.count}.bag"
-            if len(self.topics_name) == 1:
-                command += f" {self.full_topics_name[0]}"
-            elif len(self.topics_name) == 2:
-                self.sync_mode = True
-                self.sync_listener()
-                command += f" {self.special_topic_name}"
-            print(command)
-            self.process = subprocess.Popen(command, stdin=subprocess.PIPE, shell=True)
-            print(f"start record", *self.full_topics_name)
+            self.start_record()
         elif data.data == "stop record" and self.recording_status:
-            if self.sync_mode:
-                self.sync_one.unregister()
-                self.sync_two.unregister()
-                self.sync_mode = False
-            self.recording_status = False
+            self.stop_record()
+        elif re.fullmatch(r'record during \d+', data.data):
+            self.during = True
+            time_r = data.data.split()[2]
+            self.command += f" --duration={time_r}"
+            self.start_record()
+            time.sleep(int(time_r) + 1)
+            self.stop_record()
+            self.during = False
+
+    def start_record(self):
+        self.recording_status = True
+        self.command += f" -O rosbag{self.count}.bag"
+        if len(self.topics_name) == 1:
+            self.command += f" {self.full_topics_name[0]}"
+        elif len(self.topics_name) == 2:
+            self.sync_mode = True
+            self.sync_listener()
+            self.command += f" {self.special_topic_name}"
+        print(self.command)
+        self.process = subprocess.Popen(self.command, stdin=subprocess.PIPE, shell=True)
+        print(f"start record", *self.full_topics_name)
+
+    def stop_record(self):
+        if self.sync_mode:
+            self.sync_one.unregister()
+            self.sync_two.unregister()
+            self.sync_mode = False
+        self.recording_status = False
+        if not self.during:
             self.stop_process(self.process)
-            self.count += 1
-            print(f"stop record", *self.full_topics_name)
+        self.count += 1
+        self.command = f"rosbag record"
+        print(f"stop record", *self.full_topics_name)
 
     def sync_processing_both(self, data1, data2):
         pub = rospy.Publisher(self.special_topic_name, self.msg_types[0], queue_size=1)
