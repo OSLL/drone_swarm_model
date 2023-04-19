@@ -35,7 +35,7 @@ class RosbagProcess:
             self.start_record()
         elif data.data == "stop record" and self.recording_status:
             self.stop_record()
-        elif re.fullmatch(r'record during \d+', data.data):
+        elif re.fullmatch(r'record during \d+', data.data) and not self.during:
             self.during = True
             time_r = data.data.split()[2]
             self.command += f" --duration={time_r}"
