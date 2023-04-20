@@ -19,11 +19,14 @@
             <arg name="yaw" value="$(arg yaw)"/>
             <arg name="pitch" value="$(arg pitch)"/>
             <arg name="roll" value="$(arg roll)"/>
-            <arg name="robot_name" value="$(eval arg('robot_name') +'_'+ str(arg('count')))" />
+            <arg name="robot_name" value="$(eval arg('robot_name') + str(arg('count')))" />
             <arg name="model_name" value="$(arg model_name)"/>
         </include>
-    </group> 
-    
+    </group>
+
+    <arg name="__name" default="$(eval arg('robot_name') + str(arg('count')))"/>
+    <node name="$(arg __name)" pkg="camera_controls" type="driver.py" output="screen" args="$(arg __name)"/>
+
     <!-- Recursively start instance of a node -->
     <include file="$(find camera_controls)/launch/spawn_swarm.launch"    if="$(eval arg('count') - 1 > 0)">
         <arg name="count"        value="$(eval arg('count')-1)"/>
