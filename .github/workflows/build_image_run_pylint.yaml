@@ -2,9 +2,9 @@ name: Build Docker Image and Run PyLint
 
 on:
   push:
-    branches: [ "none" ]
+    branches: [ "dev", "measure/**" ]
   pull_request:
-    branches: [ "none" ]
+    branches: [ "dev", "measure/**" ]
 
 jobs:
   build:
