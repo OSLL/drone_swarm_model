@@ -51,6 +51,7 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
   FILES
   msg_transposition.msg
+  msg_odometry.msg
 )
 
 ## Generate services in the 'srv' folder
