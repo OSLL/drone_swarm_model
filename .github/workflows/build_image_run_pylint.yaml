@@ -1,0 +1,25 @@
+name: Build Docker Image and Run PyLint
+
+on:
+  push:
+    branches: [ "none" ]
+  pull_request:
+    branches: [ "none" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build the Docker image
+      working-directory: ./dataset_gen
+      run: docker build . --file Dockerfile --tag dataset_gen:latest
+    - name: Run Image and PyLint
+      working-directory: ./dataset_gen
+      run: > 
+        sudo docker run dataset_gen
+        sudo apt update &&
+        sudo apt install python3-pip -y &&
+        python3 -m pip install --upgrade pip &&
+        pip install pylint &&
+        pylint $(git ls-files '*.py') 
