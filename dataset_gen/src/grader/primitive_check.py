@@ -31,3 +31,7 @@ def _primitive_check_line(line : str) -> bool:
 def primitive_check(code : str) -> bool:
     lines = list(filter(lambda line : line.strip(), code.splitlines()))
     return all(map(_primitive_check_line, lines)) if lines else False
+
+
+if __name__ == '__main__':
+    print("This module is not executable")
