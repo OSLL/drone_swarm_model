@@ -1,10 +1,10 @@
 #! /usr/bin/python3
 # -*- coding: utf-8 -*-
 
-## Unit tests for primitive_check
+## Unit tests for primitive_checker
 
-import sys; sys.path.append("../")
-from primitive_check import primitive_check
+import sys; sys.path.append("..")
+from primitive_checker import PrimitiveChecker
 
 empty_code = [
     "",
@@ -26,6 +26,11 @@ correct_code = [
     " rotate \t\t drone 1 2 3.5",
     "translate drone 1 2 3.5  4 5.76 6  "
 ]
+
+
+def primitive_check(code : str) -> bool:
+    checker = PrimitiveChecker()
+    return checker.check(code)
 
 
 def test_empty_code():
