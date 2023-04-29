@@ -24,7 +24,7 @@ class Simulator:
             raise RuntimeError("simulation " + self._launch_file + " is already started")
         if launch_file != "":
             self._launch_file = launch_file
-        self._proc = subprocess.Popen(self._cmd + [self._launch_file])
+        self._proc = subprocess.Popen(self._cmd + [self._launch_file], stdout=subprocess.DEVNULL)
 
 
     ## @brief Terminate detached simulation process, if any
@@ -37,6 +37,12 @@ class Simulator:
             self._proc.wait(timeout if timeout > 0 else None)
         except subprocess.TimeoutExpired:
             self._proc.kill()
+        finally:
+            self._proc = None
+
+
+    def is_working(self) -> bool:
+        return False if not self._proc else self._proc.poll() is None
 
 
     def get_launch_file(self) -> str:
