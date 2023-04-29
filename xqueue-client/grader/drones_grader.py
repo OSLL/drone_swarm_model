@@ -30,7 +30,7 @@ class Grader(grader.Grader):
         #task_id = grader_config["task_id"]
         results = {}
         checker = PrimitiveChecker()
-        if checker.check(self._solution) or 1:
+        if checker.check(self._solution):
             self._start_container()
             results = self._exec_simulation_container()
             self._stop_container()
@@ -97,7 +97,6 @@ class Grader(grader.Grader):
     def _start_container(self, init_time : int = 5):
         if self._proc is None:
             if not os.getcwd().endswith("dataset_gen"):
-                print(os.getcwd())
                 os.chdir("../../dataset_gen")
             self._proc = subprocess.Popen(["docker-compose", "up"])
             if init_time:
