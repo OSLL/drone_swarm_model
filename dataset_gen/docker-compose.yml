@@ -11,5 +11,6 @@ services:
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
       - ./src:/catkin_ws/src:rw
+      - ./solution:/catkin_ws/solution:rw
     devices:
       - /dev/dri:/dev/dri
