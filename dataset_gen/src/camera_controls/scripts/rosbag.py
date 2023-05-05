@@ -28,6 +28,23 @@ class RosbagProcess:
         self.sync_two = None
         self.sync_listener_both = None
         self.msg_types = [rostopic.get_topic_class(i)[0] for i in self.full_topics_name]
+        self.timer_count = 0
+        while None in self.msg_types:
+            if self.timer_count == 0:
+                print("Waiting for ", end="", flush=True)
+                for i in [i for i, e in enumerate(self.msg_types) if e == None]:
+                    print(self.full_topics_name[i], end=" ", flush=True)
+                print("publishers", end="", flush=True)
+            print(".", end="", flush=True)
+            self.timer_count += 1
+            if self.timer_count == 10:
+                print("There is no publishers for topics: ", end="", flush=True)
+                for i in [i for i, e in enumerate(self.msg_types) if e == None]:
+                    print(self.full_topics_name[i], end=" ", flush=True)
+                    print()
+                exit()
+            time.sleep(1)
+            self.msg_types = [rostopic.get_topic_class(i)[0] for i in self.full_topics_name]
         self.special_topic_name = "/rosbag_sync_topic"
 
     def processing(self, data):
@@ -99,7 +116,11 @@ class RosbagProcess:
 
 if __name__ == '__main__':
     try:
+        topic_check = sys.argv[2]
         rosbag = RosbagProcess(sys.argv[1], list(sys.argv[2:]))
+        print("start record: enable recording")
+        print("stop record: disable recording")
+        print("record during n: enable recording during n seconds")
         rosbag.listener()
     except (rospy.ROSInterruptException, IndexError):
         print("Check argument!")
