@@ -13,6 +13,11 @@ import message_filters
 from std_msgs.msg import String
 
 
+class Data:
+    def __init__(self, data):
+        self.data = data
+
+
 class RosbagProcess:
     def __init__(self, drone_name, topics_name):
         self.drone_name = drone_name
@@ -52,7 +57,7 @@ class RosbagProcess:
             self.start_record()
         elif data.data == "stop record" and self.recording_status:
             self.stop_record()
-        elif re.fullmatch(r'record during \d+', data.data) and not self.during:
+        elif re.fullmatch(r'record during \d+', data.data) and not self.during and not self.recording_status:
             self.during = True
             time_r = data.data.split()[2]
             self.command += f" --duration={time_r}"
@@ -111,7 +116,13 @@ class RosbagProcess:
     def listener(self):
         rospy.init_node('rosbaglistener')
         rospy.Subscriber("rosbag_command", String, self.processing)
+        rosbag.listener_command_line()
         rospy.spin()
+
+    def listener_command_line(self):
+        while not rospy.is_shutdown():
+            data = Data(input())
+            self.processing(data)
 
 
 if __name__ == '__main__':
