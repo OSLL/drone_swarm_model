@@ -14,6 +14,8 @@ def odometry_client(model_name):
     try:
         odom_s = rospy.ServiceProxy(odom, GetModelState)
         model_state = odom_s(model_name, "")
+        if model_state.success == False:
+            raise rospy.ServiceException
         position = model_state.pose.position
         orientation = model_state.pose.orientation
         return position, orientation
