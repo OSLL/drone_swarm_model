@@ -34,37 +34,76 @@ class RosbagProcess:
         self.sync_listener_both = None
         self.msg_types = [rostopic.get_topic_class(i)[0] for i in self.full_topics_name]
         self.timer_count = 0
-        while None in self.msg_types:
+        self.available_flag = [False, False]
+        self.first_time = True
+        self.check_availability_topics()
+        self.first_time = False
+        self.special_topic_name = "/rosbag_sync_topic"
+
+    def check_availability_topics(self):
+        for i in range(len(self.full_topics_name)):
+            try:
+                a = rostopic.get_info_text(self.full_topics_name[i])
+                self.available_flag[i] = True
+                if len(self.full_topics_name) == 1:
+                    self.available_flag[1] = True
+            except rostopic.ROSTopicException:
+                self.available_flag[i] = False
+                if len(self.full_topics_name) == 1:
+                    self.available_flag[1] = False
+        while False in self.available_flag:
             if self.timer_count == 0:
                 print("Waiting for ", end="", flush=True)
-                for i in [i for i, e in enumerate(self.msg_types) if e == None]:
-                    print(self.full_topics_name[i], end=" ", flush=True)
+                for i in [i for i, e in enumerate(self.available_flag) if e == False]:
+                    if len(self.full_topics_name) == 1:
+                        print(self.full_topics_name[0], end=" ", flush=True)
+                        break
+                    else:
+                        print(self.full_topics_name[i], end=" ", flush=True)
                 print("publishers", end="", flush=True)
             print(".", end="", flush=True)
             self.timer_count += 1
             if self.timer_count == 10:
+                self.timer_count = 0
                 print("There is no publishers for topics: ", end="", flush=True)
-                for i in [i for i, e in enumerate(self.msg_types) if e == None]:
-                    print(self.full_topics_name[i], end=" ", flush=True)
-                    print()
-                exit()
+                for i in [i for i, e in enumerate(self.available_flag) if e == False]:
+                    if len(self.full_topics_name) == 1:
+                        print(self.full_topics_name[0], end=" ", flush=True)
+                        break
+                    else:
+                        print(self.full_topics_name[i], end=" ", flush=True)
+                print()
+                if self.first_time:
+                    exit()
+                return False
             time.sleep(1)
-            self.msg_types = [rostopic.get_topic_class(i)[0] for i in self.full_topics_name]
-        self.special_topic_name = "/rosbag_sync_topic"
+            for i in range(len(self.full_topics_name)):
+                try:
+                    a = rostopic.get_info_text(self.full_topics_name[i])
+                    self.available_flag[i] = True
+                    if len(self.full_topics_name) == 1:
+                        self.available_flag[1] = True
+                except rostopic.ROSTopicException:
+                    self.available_flag[i] = False
+                    if len(self.full_topics_name) == 1:
+                        self.available_flag[1] = False
+        return True
 
     def processing(self, data):
         if data.data == "start record" and not self.recording_status:
-            self.start_record()
+            if self.check_availability_topics():
+                self.start_record()
         elif data.data == "stop record" and self.recording_status:
             self.stop_record()
         elif re.fullmatch(r'record during \d+', data.data) and not self.during and not self.recording_status:
-            self.during = True
-            time_r = data.data.split()[2]
-            self.command += f" --duration={time_r}"
-            self.start_record()
-            time.sleep(int(time_r) + 1)
-            self.stop_record()
-            self.during = False
+            if self.check_availability_topics():
+                self.during = True
+                time_r = data.data.split()[2]
+                self.command += f" --duration={time_r}"
+                self.start_record()
+                time.sleep(int(time_r) + 1)
+                self.stop_record()
+                self.during = False
 
     def start_record(self):
         self.recording_status = True
@@ -75,7 +114,7 @@ class RosbagProcess:
             self.sync_mode = True
             self.sync_listener()
             self.command += f" {self.special_topic_name}"
-        print(self.command)
+        print("\n" + self.command)
         self.process = subprocess.Popen(self.command, stdin=subprocess.PIPE, shell=True)
         print(f"start record", *self.full_topics_name)
 
@@ -129,7 +168,7 @@ if __name__ == '__main__':
     try:
         topic_check = sys.argv[2]
         rosbag = RosbagProcess(sys.argv[1], list(sys.argv[2:]))
-        print("start record: enable recording")
+        print("\nstart record: enable recording")
         print("stop record: disable recording")
         print("record during n: enable recording during n seconds")
         rosbag.listener()
