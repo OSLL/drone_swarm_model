@@ -39,6 +39,7 @@ class RosbagProcess:
         self.check_availability_topics()
         self.first_time = False
         self.special_topic_name = "/rosbag_sync_topic"
+        self.special_topic_name2 = "/rosbag_sync_topic2"
 
     def check_availability_topics(self):
         for i in range(len(self.full_topics_name)):
@@ -113,7 +114,7 @@ class RosbagProcess:
         elif len(self.topics_name) == 2:
             self.sync_mode = True
             self.sync_listener()
-            self.command += f" {self.special_topic_name}"
+            self.command += f" {self.special_topic_name} {self.special_topic_name2}"
         print("\n" + self.command)
         self.process = subprocess.Popen(self.command, stdin=subprocess.PIPE, shell=True)
         print(f"start record", *self.full_topics_name)
@@ -133,7 +134,7 @@ class RosbagProcess:
     def sync_processing_both(self, data1, data2):
         pub = rospy.Publisher(self.special_topic_name, self.msg_types[0], queue_size=1)
         pub.publish(data1)
-        pub = rospy.Publisher(self.special_topic_name, self.msg_types[1], queue_size=2)
+        pub = rospy.Publisher(self.special_topic_name2, self.msg_types[1], queue_size=2)
         pub.publish(data2)
 
     def sync_listener(self):
