@@ -1,7 +1,0 @@
-<launch>
-  <arg name="model_filename" default="bulding.urdf.xacro" />
-
-  <param name="cottage_blender_Cube_description" command="$(find xacro)/xacro --inorder '$(find cottage)/urdf/$(arg model_filename)'" />
-
-  <node name="spawn_cottage_blender_Cube" pkg="gazebo_ros" type="spawn_model" args="-param cottage_blender_Cube_description -urdf -model cottage_blender_Cube" respawn="false" />
-</launch>

@@ -1,0 +1,16 @@
+{
+	"drone-swarm": {
+		"SERVER": "http://localhost:8000",
+		"CONNECTIONS": 1,
+		"AUTH": ["admin", "alpine"],
+		"HANDLERS": [
+			{
+				"HANDLER": "grader.drones_grader.Grader",
+				"KWARGS": {
+					"grader_root": "../grader/"
+				}
+			}
+		],
+		"POLL_INTERVAL": 1000
+	}
+}
