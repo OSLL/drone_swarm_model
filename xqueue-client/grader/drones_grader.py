@@ -36,10 +36,16 @@ class Grader(grader.Grader):
             self._stop_container()
         else:
             results = {
-                'correct': 0,
                 'score': 0,
-                'tests': [],
-                'errors': []
+                'correct': False,
+                'tests': [(
+                    'Basic check failed', 
+                    'Wrong syntax or empty solution. No drones were launched.', 
+                    False, 
+                    '-', 
+                    '-'
+                )],
+                'errors': checker.get_errors()
             }
         return results
 
