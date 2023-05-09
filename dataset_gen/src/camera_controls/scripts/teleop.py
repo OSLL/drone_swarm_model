@@ -14,6 +14,20 @@ from select import select
 import termios
 import tty
 import subprocess
+import rosnode
+
+
+# Проверяем начилие драйвер для дрона drone_name
+def wait_for_subcriber(drone_name):
+    drone_name = '/' + drone_name
+    find = False
+    while not find:
+        for node in rosnode.get_node_names():
+            if drone_name == node:
+                find = True
+                break
+        print(f'No driver found for the drone named \'{drone_name[1:]}\'')
+        time.sleep(1)
 
 
 # Получение нажатой клавиши
@@ -30,6 +44,7 @@ def getKey(settings, timeout):
     return key
 
 
+# Сообщение, которое мы отправим драйверу
 class RobotState:
     # Конструктор
     def __init__(self):
@@ -40,9 +55,6 @@ class RobotState:
         self.pitch = 0
         self.yaw = 0
         self.delta = 0.1
-
-    def __str__(self):
-        return ' '.join(map(str, [self.x, self.y, self.z, self.roll, self.pitch, self.yaw]))
 
     def increase_x(self):
         self.x += self.delta
@@ -80,12 +92,14 @@ class RobotState:
     def decrease_yaw(self):
         self.yaw -= self.delta
 
+# Конвертация дробного числа в строку для отображения в консоли
 def float_to_string(num):
     sign = '+'
     if num < 0:
         sign = ''
     return sign + f'{num:.4f}'
 
+# Печать пользовательствого интерфейса в консоли
 def print_UI(msg):
     print(f"""                                                              U
                      B    W                                   ↑ 
@@ -100,6 +114,7 @@ def print_UI(msg):
                  /   |                                   / ↓ |                
                 S  SPACE                                   L
                 """)
+
 
 def talker():
     msg = RobotState()
@@ -123,10 +138,13 @@ def talker():
     rospy.init_node('teleop')
     # Имя дрона без слеша (e.g. 'drone1')
     drone_name = rospy.get_name()[1:-7]
+    # Ожидаем запуск драйвера для дрона
+    wait_for_subcriber(drone_name)
 
     pub = rospy.Publisher(f'{drone_name}/cmd_vel', msg_transposition, queue_size=4)
 
     subprocess.call('clear', stdin=True, shell=True)
+    print(f'Driver for drone \'{drone_name}\' found')
     print_UI(msg)
 
     while not rospy.is_shutdown():
