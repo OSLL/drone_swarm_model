@@ -113,7 +113,7 @@ class Grader:
                     check.append(barrier["borders"][ind][0] - 0.5 < position[ind] <
                                  barrier["borders"][ind][1] + 0.5)  # drone size?
                 if not all(check):
-                    break
+                    continue
                 equation = barrier["equation"]
                 if abs(equation[0]*position[0] +
                        equation[1]*position[1] +
