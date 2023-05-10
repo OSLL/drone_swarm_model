@@ -11,15 +11,16 @@ from tf.transformations import euler_from_quaternion, quaternion_from_euler, qua
 
 def odometry_client(model_name):
     odom = '/gazebo/get_model_state'
-    rospy.wait_for_service(odom)
     try:
         odom_s = rospy.ServiceProxy(odom, GetModelState)
         model_state = odom_s(model_name, "")
+        if model_state.success == False:
+            raise rospy.ServiceException
         position = model_state.pose.position
         orientation = model_state.pose.orientation
         return position, orientation
     except rospy.ServiceException as e:
-        print(f"Service call failed: {e}")
+        print(f"Service odometry call failed for drone with name {model_name}: Check drone or simulation!")
 
 
 def rotate_by_quat(q1, v1):
@@ -116,6 +117,7 @@ if __name__ == '__main__':
     try:
         rospy.init_node('dronecontroller')
         global_storage = GlobalStorage()
+        global_storage.help()
         while not rospy.is_shutdown():
             command = input()
             if len(command) == 0:
