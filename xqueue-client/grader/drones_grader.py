@@ -7,8 +7,8 @@ import os
 import time
 import json
 from statsd import statsd
-from performer import Performer
 
+from .performer import Performer
 from .primitive_checker import PrimitiveChecker
 
 sys.path.append("..")
@@ -105,11 +105,11 @@ class Grader(grader.Grader):
 
 
     def _exec_simulation_container(self):
-        #with open("solution/solution", "w") as solution_file:
-        #    solution_file.write(self._solution)
+        with open("solution/solution", "w") as solution_file:
+            solution_file.write(self._solution)
         subprocess.run(["docker", "exec", "-it", "dataset_gen", "bash"])
-	performer = Performer(self._solution)
-	try:
+        performer = Performer(self._solution)
+        try:
             performer.perform_solution()
         except Exception as e:
             print(e)
