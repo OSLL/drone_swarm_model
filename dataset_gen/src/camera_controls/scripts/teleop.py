@@ -27,7 +27,7 @@ def wait_for_subcriber(drone_name):
                 find = True
                 break
         print(f'No driver found for the drone named \'{drone_name[1:]}\'')
-        time.sleep(1)
+        rospy.sleep(1)
 
 
 # Получение нажатой клавиши
@@ -136,12 +136,18 @@ def talker():
                 'u': lambda message: message.decrease_yaw()}
 
     rospy.init_node('teleop')
+
+    topic_name = rospy.get_param('~topic')
+
     # Имя дрона без слеша (e.g. 'drone1')
-    drone_name = rospy.get_name()[1:-7]
+    drone_name = topic_name[1:-8]
     # Ожидаем запуск драйвера для дрона
+
+
     wait_for_subcriber(drone_name)
 
-    pub = rospy.Publisher(f'{drone_name}/cmd_vel', msg_transposition, queue_size=4)
+
+    pub = rospy.Publisher(topic_name, msg_transposition, queue_size=4)
 
     subprocess.call('clear', stdin=True, shell=True)
     print(f'Driver for drone \'{drone_name}\' found')
