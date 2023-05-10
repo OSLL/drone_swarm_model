@@ -1,7 +1,7 @@
 from random import random
 
 from grader_config import dist_grade, metric, pos_coeff, photo_coeff
-from task_config import time_limit, x_range, y_range, z_range, photos
+from task_config import time_limit, x_range, y_range, z_range, barriers
 from task_solution import positions, photos as made_photos, used_time
 
 
@@ -35,9 +35,9 @@ class Grader:
         if self.metric == "chessboard":
             return max(abs(x), abs(y), abs(z))
         elif self.metric == "taxicab":
-            return sum(abs(x) + abs(y) + abs(z))
+            return abs(x) + abs(y) + abs(z)
         elif self.metric != "plane":
-            print("Unknown metric, proposed euqclidean")  # raise?
+            print("Unknown metric, proposed euclidean")  # raise?
         return (x**2 + y**2 + z**2)**0.5
 
     def __get_pos(self, drone):
@@ -82,8 +82,17 @@ class Grader:
                 + used_photo_coeff*self.__grade_photo()) \
             / (used_pos_coeff + used_photo_coeff)
 
-    def __check_borders(self, drone, task):
+    def check_solution(self, drone, task):
         solution = SolutionReader(drone, task)
+        if not self.__check_time(solution):
+            return False
+        if not self.__check_borders(solution):
+            return False
+        if not self.__check_collision(solution):
+            return False
+        return True
+
+    def __check_borders(self, solution):
         positions = solution.positions
         x = (min([i[0] for i in positions]), max([i[0] for i in positions]))
         if x[0] < x_range[0] or x[1] > x_range[1]:
@@ -96,11 +105,27 @@ class Grader:
             return False
         return True
 
-    def __check_time(self):
-        solution = SolutionReader(drone, task)
-        return self.solution.time <= time_limit
+    def __check_collision(self, solution):
+        for position in solution.positions:
+            for barrier in barriers:
+                check = []
+                for ind in range(3):
+                    check.append(barrier["borders"][ind][0] - 0.5 < position[ind] <
+                                 barrier["borders"][ind][1] + 0.5)  # drone size?
+                if not all(check):
+                    break
+                equation = barrier["equation"]
+                if abs(equation[0]*position[0] +
+                       equation[1]*position[1] +
+                       equation[2]*position[2] - equation[3]) < 0.5:
+                    return False
+        return True
+
+    def __check_time(self, solution):
+        return solution.time <= time_limit
 
 
 for _ in range(3):
     grader = Grader(['1', '2', '3'], 1, ["photo", "position"])
     print(grader.grade())
+
