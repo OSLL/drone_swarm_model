@@ -1,0 +1,5 @@
+move drone 0 0 0
+move_direct     drone 1.34 3.14 346
+ move    drone 0120 874 1231
+ rotate 		 drone 1 2 3.5
+translate drone 1 2 3.5  4 5.76 6  

@@ -8,7 +8,6 @@ import time
 import json
 from statsd import statsd
 
-from .performer import Performer
 from .primitive_checker import PrimitiveChecker
 
 sys.path.append("..")
@@ -107,20 +106,9 @@ class Grader(grader.Grader):
     def _exec_simulation_container(self):
         with open("solution/solution", "w") as solution_file:
             solution_file.write(self._solution)
-        subprocess.run(["docker", "exec", "-it", "dataset_gen", "bash"])
-        performer = Performer(self._solution)
-        try:
-            performer.perform_solution()
-        except Exception as e:
-            print(e)
-            results = {
-                'correct': 0,
-                'score': 0,
-                'tests': [],
-                'errors': []
-            }
-            return results
+        proc = subprocess.Popen(["docker", "exec", "-i", "dataset_gen", "bash"], stdin=subprocess.PIPE, encoding='utf-8')
         results = {}
+        #TODO: how wait ending of simul?
         with open("solution/result", "r") as result_file:
             results = json.loads('\n'.join(result_file.readlines()))
         os.remove("solution/result")

@@ -123,9 +123,9 @@ if __name__ == '__main__':
             else:
                 c, *args = command.split(" ")
                 try:
+                    print("Check commands!")
                     global_storage.run_command(c, args[0], *map(float, args[1:]))
                 except (AttributeError, TypeError, ValueError, IndexError) as e:
-                    print("Check commands!")
                     global_storage.help()
     except rospy.ROSInterruptException:
         pass
