@@ -57,13 +57,13 @@ float64 w
 ```
 # Rosbag_recorder.py
 ## Запуск
-Запуск узла rosbag записи для дрона *drone_name* для одного топика
+Запуск узла rosbag записи для дрона для одного топика
 ```sh
-rosrun camera_controls rosbag_recorder.py drone_name topic_name_without_drone_name_part
+rosrun camera_controls rosbag_recorder.py /topic_name
 ```
-Запуск узла rosbag записи для дрона *drone_name* для двух топиков
+Запуск узла rosbag записи для дрона для двух топиков
 ```sh
-rosrun camera_controls rosbag_recorder.py drone_name topic1_name_without_drone_name_part topic2_name_without_drone_name_part
+rosrun camera_controls rosbag_recorder.py /topic1_name /topic2_name
 ```
 ## Работа с узлом rosbag записи
 Запуск записи
