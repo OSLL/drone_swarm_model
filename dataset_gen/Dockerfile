@@ -8,5 +8,5 @@ RUN . /opt/ros/noetic/setup.sh && \
 
 RUN echo ". /opt/ros/noetic/setup.bash" >> ~/.bashrc && \
     echo ". /catkin_ws/devel/setup.bash " >> ~/.bashrc && \
-    echo "python3 /catkin_ws/src/performer.py; exit" >> ~/.bashrc #&& \    # TODO: uncomment to run grader
+    echo "python3 /catkin_ws/src/grader/performer.py; exit" >> ~/.bashrc #&& \    # TODO: uncomment to run grader
    # echo "python3 /catkin_ws/src/grader; exit" >> ~/.bashrc

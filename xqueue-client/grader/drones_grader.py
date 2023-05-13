@@ -98,7 +98,7 @@ class Grader(grader.Grader):
         if self._proc is None:
             if not os.getcwd().endswith("dataset_gen"):
                 os.chdir("../../dataset_gen")
-            self._proc = subprocess.Popen(["docker-compose", "up"])
+            self._proc = subprocess.Popen(["docker-compose", "up","--detach"])
             if init_time:
                 time.sleep(init_time)
 
@@ -106,12 +106,27 @@ class Grader(grader.Grader):
     def _exec_simulation_container(self):
         with open("solution/solution", "w") as solution_file:
             solution_file.write(self._solution)
-        proc = subprocess.Popen(["docker", "exec", "-i", "dataset_gen", "bash"], stdin=subprocess.PIPE, encoding='utf-8')
-        results = {}
-        #TODO: how wait ending of simul?
-        with open("solution/result", "r") as result_file:
-            results = json.loads('\n'.join(result_file.readlines()))
-        os.remove("solution/result")
+        proc = subprocess.Popen(["docker", "exec", "-it", "dataset_gen", "bash"], stdin=subprocess.PIPE, encoding='utf-8')
+        #proc = subprocess.run('docker exec -i dataset_gen bash', shell=True)
+
+        results = {
+            'correct': 0,
+            'score': 0,
+            'tests': [],
+            'errors': []
+            }
+        #start_time = time.time()
+        #timeout_flag = False
+        #while('result' not in os.listdir('./solution')):
+        #    if time.time() - start_time > 60:
+        #        timeout_flag = True
+        #        break
+        #if timeout_flag:
+        #    return {}
+        #with open("solution/result", "r") as result_file:
+        #    results = json.loads('\n'.join(result_file.readlines()))
+        #    print(result_file.read())
+        #os.remove("solution/result")
         return results
 
 

@@ -116,16 +116,19 @@ if __name__ == '__main__':
     try:
         rospy.init_node('dronecontroller')
         global_storage = GlobalStorage()
+        print("Controller is up")
         while not rospy.is_shutdown():
             command = input()
             if len(command) == 0:
                 continue
             else:
                 c, *args = command.split(" ")
+                if c == "exit":
+                    break
                 try:
-                    print("Check commands!")
                     global_storage.run_command(c, args[0], *map(float, args[1:]))
                 except (AttributeError, TypeError, ValueError, IndexError) as e:
+                    print("Check commands!")
                     global_storage.help()
     except rospy.ROSInterruptException:
         pass
