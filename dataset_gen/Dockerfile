@@ -7,6 +7,5 @@ RUN . /opt/ros/noetic/setup.sh && \
     catkin_make
 
 RUN echo ". /opt/ros/noetic/setup.bash" >> ~/.bashrc && \
-    echo ". /catkin_ws/devel/setup.bash " >> ~/.bashrc && \
-    echo "python3 /catkin_ws/src/grader/performer.py; exit" >> ~/.bashrc #&& \    # TODO: uncomment to run grader
-   # echo "python3 /catkin_ws/src/grader; exit" >> ~/.bashrc
+    echo ". /catkin_ws/devel/setup.bash " >> ~/.bashrc #&& \ #uncomment to run performer
+    #echo "python3 /catkin_ws/src/grader/performer.py; exit" >> ~/.bashrc
