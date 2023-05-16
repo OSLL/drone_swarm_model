@@ -38,8 +38,6 @@ class Performer():
             cmd_driver = ['rosrun', 'camera_controls', 'driver.py', '__name:='+i]
             d_p = subprocess.Popen(cmd_driver)         
             driver_proc.append(d_p)
-
-        time.sleep(self._base_time_wait)
         proc = subprocess.Popen(self._cmd, stdin=subprocess.PIPE, encoding="utf-8")
         time.sleep(self._base_time_wait)
         
