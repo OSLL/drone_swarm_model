@@ -116,7 +116,7 @@ if __name__ == '__main__':
     try:
         rospy.init_node('dronecontroller')
         global_storage = GlobalStorage()
-        print("Controller is up")
+        global_storage.help()
         while not rospy.is_shutdown():
             command = input()
             if len(command) == 0:
