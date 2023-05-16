@@ -106,8 +106,7 @@ class Grader(grader.Grader):
     def _exec_simulation_container(self):
         with open("solution/solution", "w") as solution_file:
             solution_file.write(self._solution)
-        proc = subprocess.Popen(["docker", "exec", "-it", "dataset_gen", "bash"], stdin=subprocess.PIPE, encoding='utf-8')
-        #proc = subprocess.run('docker exec -i dataset_gen bash', shell=True)
+        proc = subprocess.Popen(["docker", "exec", "-it", "dataset_gen", "bash"])
 
         results = {
             'correct': 0,
@@ -115,17 +114,17 @@ class Grader(grader.Grader):
             'tests': [],
             'errors': []
             }
-        #start_time = time.time()
-        #timeout_flag = False
-        #while('result' not in os.listdir('./solution')):
-        #    if time.time() - start_time > 60:
-        #        timeout_flag = True
-        #        break
-        #if timeout_flag:
-        #    return {}
-        #with open("solution/result", "r") as result_file:
-        #    results = json.loads('\n'.join(result_file.readlines()))
-        #    print(result_file.read())
+        start_time = time.time()
+        timeout_flag = False
+        while('result' not in os.listdir('./solution')):
+            if time.time() - start_time > 60:
+                timeout_flag = True
+                break
+        if timeout_flag:
+            return result
+        with open("solution/result", "r") as result_file:
+            results = json.loads('\n'.join(result_file.readlines()))
+            print(result)
         #os.remove("solution/result")
         return results
 

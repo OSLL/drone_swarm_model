@@ -46,7 +46,6 @@ class Performer():
         solution = self.solution.copy()
         solution.append("exit")
         result = proc.communicate('\n'.join(solution))
-        print(result)
 
 if __name__ == '__main__':
     print("performer started")
@@ -54,7 +53,13 @@ if __name__ == '__main__':
         solution = f.read()
     performer = Performer(solution)
     #performer = Performer("move drone1 0 0 0\nmove_direct     drone1 1.34 3.14 346\n move    drone1 0120 874 1231\n rotate \t\t drone2 1 2 3.5\ntranslate drone1 1 2 3.5  4 5.76 6  ")
+    results = {
+            'correct': 0,
+            'score': 0,
+            'tests': [],
+            'errors': []
+            }
+    result = json.dumps(result, indent=4)
     performer.perform_solution()
     with open("solution/result", 'w') as f:
-        f.write("ololo")
-
+        f.write(result)
