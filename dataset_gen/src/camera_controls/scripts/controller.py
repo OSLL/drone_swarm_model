@@ -124,6 +124,8 @@ if __name__ == '__main__':
                 continue
             else:
                 c, *args = command.split(" ")
+                if c == "exit":
+                    break
                 try:
                     global_storage.run_command(c, args[0], *map(float, args[1:]))
                 except (AttributeError, TypeError, ValueError, IndexError) as e:

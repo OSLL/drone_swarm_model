@@ -104,7 +104,7 @@ class Grader(grader.Grader):
         if self._proc is None:
             if not os.getcwd().endswith("dataset_gen"):
                 os.chdir("../../dataset_gen")
-            self._proc = subprocess.Popen(["docker-compose", "up"])
+            self._proc = subprocess.Popen(["docker-compose", "up","--detach"])
             if init_time:
                 time.sleep(init_time)
 
@@ -112,10 +112,26 @@ class Grader(grader.Grader):
     def _exec_simulation_container(self):
         with open("solution/solution", "w") as solution_file:
             solution_file.write(self._solution)
-        subprocess.run(["docker", "exec", "-it", "dataset_gen", "bash"])
-        results = {}
+        proc = subprocess.Popen(["docker", "exec", "-it", "dataset_gen", "bash"])
+
+        results = {
+            'correct': 0,
+            'score': 0,
+            'tests': [],
+            'errors': []
+            }
+        start_time = time.time()
+        timeout_flag = False
+        while('result' not in os.listdir('./solution')):
+            time.sleep(3)
+            if time.time() - start_time > 60:
+                timeout_flag = True
+                break
+        if timeout_flag:
+            return results
         with open("solution/result", "r") as result_file:
             results = json.loads('\n'.join(result_file.readlines()))
+            print(results)
         os.remove("solution/result")
         return results
 
