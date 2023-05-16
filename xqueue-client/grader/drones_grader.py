@@ -117,15 +117,16 @@ class Grader(grader.Grader):
         start_time = time.time()
         timeout_flag = False
         while('result' not in os.listdir('./solution')):
+            time.sleep(3)
             if time.time() - start_time > 60:
                 timeout_flag = True
                 break
         if timeout_flag:
-            return result
+            return results
         with open("solution/result", "r") as result_file:
             results = json.loads('\n'.join(result_file.readlines()))
-            print(result)
-        #os.remove("solution/result")
+            print(results)
+        os.remove("solution/result")
         return results
 
 
