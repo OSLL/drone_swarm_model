@@ -59,7 +59,7 @@ if __name__ == '__main__':
             'tests': [],
             'errors': []
             }
-    result = json.dumps(result, indent=4)
+    results = json.dumps(results, indent=4)
     performer.perform_solution()
     with open("solution/result", 'w') as f:
-        f.write(result)
+        f.write(results)
