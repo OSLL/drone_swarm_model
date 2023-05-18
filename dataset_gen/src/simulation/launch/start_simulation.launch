@@ -11,7 +11,7 @@
     <arg name="roll"       default="0"/>
 
     <include file="$(find simulation)/launch/create_simulation.launch">
-    <arg name="world" value="$(find simulation)/worlds/$(arg world_name).world" />
+        <arg name="world" value="$(arg world_name)" />
     </include>
 
     <include file="$(find camera_controls)/launch/spawn_swarm.launch">
