@@ -19,10 +19,9 @@ class Data:
 
 
 class RosbagProcess:
-    def __init__(self, drone_name, topics_name):
-        self.drone_name = drone_name
+    def __init__(self, topics_name):
         self.topics_name = topics_name
-        self.full_topics_name = [f"/{self.drone_name}/{topics_name[i]}" for i in range(len(topics_name))]
+        self.full_topics_name = [f"{topics_name[i]}" for i in range(len(topics_name))]
         self.command = f"rosbag record"
         self.process = None
         self.recording_status = False
@@ -167,8 +166,8 @@ class RosbagProcess:
 
 if __name__ == '__main__':
     try:
-        topic_check = sys.argv[2]
-        rosbag = RosbagProcess(sys.argv[1], list(sys.argv[2:]))
+        topic_check = sys.argv[1]
+        rosbag = RosbagProcess(list(sys.argv[1:]))
         print("\nstart record: enable recording")
         print("stop record: disable recording")
         print("record during n: enable recording during n seconds")
