@@ -9,6 +9,8 @@
     <arg name="yaw" default="0.0"/>
     <arg name="pitch" default="0.0"/>
     <arg name="roll" default="0.0"/>
+
+    <arg name="__name" default="$(eval arg('robot_name') + str(arg('count')))"/>
     <!-- Start Node -->
     <group   ns="$(eval 'drone' + str(arg('count')))">
      <param name="tf_prefix" value="$(eval 'drone' + str(arg('count'))+ '_tf')" />
@@ -19,11 +21,12 @@
             <arg name="yaw" value="$(arg yaw)"/>
             <arg name="pitch" value="$(arg pitch)"/>
             <arg name="roll" value="$(arg roll)"/>
-            <arg name="robot_name" value="$(eval arg('robot_name') +'_'+ str(arg('count')))" />
+            <arg name="robot_name" value="$(eval arg('robot_name') + str(arg('count')))" />
             <arg name="model_name" value="$(arg model_name)"/>
         </include>
-    </group> 
-    
+    </group>
+    <node name="$(eval 'drone' + str(arg('count')))" pkg="camera_controls" type="driver.py" output="screen" args="$(arg __name)"/>
+
     <!-- Recursively start instance of a node -->
     <include file="$(find camera_controls)/launch/spawn_swarm.launch"    if="$(eval arg('count') - 1 > 0)">
         <arg name="count"        value="$(eval arg('count')-1)"/>
@@ -35,6 +38,7 @@
         <arg name="yaw"        value="$(arg yaw)"/>
         <arg name="pitch"      value="$(arg pitch)"/>
         <arg name="roll"       value="$(arg roll)"/>
+        <arg name="__name" value="$(eval arg('robot_name') + str(arg('count')-1))"/>
     </include>
 </launch>
 
