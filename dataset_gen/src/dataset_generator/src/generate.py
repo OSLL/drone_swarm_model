@@ -142,7 +142,7 @@ def curve_visualization(x, y, z):
     import matplotlib.pyplot as plt
     from mpl_toolkits.mplot3d import Axes3D
 
-    fig = plt.figure()
+    plt.figure()
     ax = plt.axes(projection="3d")
     ax.scatter3D(x, y, z)
     plt.show()

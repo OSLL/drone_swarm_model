@@ -44,11 +44,10 @@ def usage():
 
 
 if __name__ == "__main__":
-    if len(sys.argv) == 3:
-        cname = sys.argv[1]
-        camera_info = sys.argv[2]
-    else:
+    if len(sys.argv) != 3:
         print(usage())
         sys.exit(1)
+    cname = sys.argv[1]
+    camera_info = sys.argv[2]    
     res = set_camera_info_client(cname, camera_info)
     print(res)

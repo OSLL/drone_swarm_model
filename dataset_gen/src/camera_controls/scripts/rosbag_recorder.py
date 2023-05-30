@@ -23,7 +23,7 @@ class RosbagProcess:
     def __init__(self, topics_name):
         self.topics_name = topics_name
         self.full_topics_name = [f"{topics_name[i]}" for i in range(len(topics_name))]
-        self.command = f"rosbag record"
+        self.command = "rosbag record"
         self.process = None
         self.recording_status = False
         self.count = 0
@@ -44,7 +44,7 @@ class RosbagProcess:
     def check_availability_topics(self):
         for i in range(len(self.full_topics_name)):
             try:
-                a = rostopic.get_info_text(self.full_topics_name[i])
+                rostopic.get_info_text(self.full_topics_name[i])
                 self.available_flag[i] = True
                 if len(self.full_topics_name) == 1:
                     self.available_flag[1] = True
@@ -80,7 +80,7 @@ class RosbagProcess:
             time.sleep(1)
             for i in range(len(self.full_topics_name)):
                 try:
-                    a = rostopic.get_info_text(self.full_topics_name[i])
+                    rostopic.get_info_text(self.full_topics_name[i])
                     self.available_flag[i] = True
                     if len(self.full_topics_name) == 1:
                         self.available_flag[1] = True
@@ -121,7 +121,7 @@ class RosbagProcess:
             self.command += f" {self.special_topic_name} {self.special_topic_name2}"
         print("\n" + self.command)
         self.process = subprocess.Popen(self.command, stdin=subprocess.PIPE, shell=True)
-        print(f"start record", *self.full_topics_name)
+        print("start record", *self.full_topics_name)
 
     def stop_record(self):
         if self.sync_mode:
@@ -132,8 +132,8 @@ class RosbagProcess:
         if not self.during:
             self.stop_process(self.process)
         self.count += 1
-        self.command = f"rosbag record"
-        print(f"stop record", *self.full_topics_name)
+        self.command = "rosbag record"
+        print("stop record", *self.full_topics_name)
 
     def sync_processing_both(self, data1, data2):
         pub = rospy.Publisher(self.special_topic_name, self.msg_types[0], queue_size=1)

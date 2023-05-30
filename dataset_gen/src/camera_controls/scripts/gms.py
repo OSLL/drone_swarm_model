@@ -32,11 +32,10 @@ def usage():
 
 
 if __name__ == "__main__":
-    if len(sys.argv) == 2:
-        model_name = sys.argv[1]
-    else:
+    if len(sys.argv) != 2:
         print(usage())
         sys.exit(1)
+    model_name = sys.argv[1]
     print(f"Requesting {model_name}")
     position, orientation = gms_client(model_name, "")
     print(position)

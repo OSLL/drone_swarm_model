@@ -112,7 +112,7 @@ class Grader(grader.Grader):
     def _exec_simulation_container(self):
         with open("solution/solution", "w") as solution_file:
             solution_file.write(self._solution)
-        proc = subprocess.Popen(["docker", "exec", "-it", "dataset_gen", "bash"])
+        subprocess.Popen(["docker", "exec", "-it", "dataset_gen", "bash"])
 
         results = {"correct": 0, "score": 0, "tests": [], "errors": []}
         start_time = time.time()

@@ -32,12 +32,11 @@ def usage():
 
 
 if __name__ == "__main__":
-    if len(sys.argv) == 8:
-        model_name = sys.argv[1]
-        x, y, z, roll, pitch, yaw = map(float, sys.argv[2:])
-    else:
+    if len(sys.argv) != 8:
         print(usage())
         sys.exit(1)
+    model_name = sys.argv[1]
+    x, y, z, roll, pitch, yaw = map(float, sys.argv[2:])
     print(f"Moving {model_name} to XYZ=({x},{y},{z}), RPY=({roll},{pitch},{yaw})")
     res = move_client(model_name, (x, y, z), (roll, pitch, yaw))
     print(res)

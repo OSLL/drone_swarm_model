@@ -37,7 +37,6 @@ class Performer:
         proc_sim = subprocess.Popen("roslaunch simulation sim.launch", shell=True)
         time.sleep(self._base_time_wait + int(0.5 * len(drone_names)))
         driver_proc = []
-        driver_vel_proc = []
         for i in drone_names:
             print(i)
             cmd_driver = ["rosrun", "camera_controls", "driver.py", "__name:=" + i]

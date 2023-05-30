@@ -1,5 +1,4 @@
 import json
-import subprocess
 
 from performer import Performer
 from simulator import Simulator

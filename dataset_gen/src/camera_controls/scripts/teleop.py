@@ -2,7 +2,6 @@
 import subprocess
 import sys
 import termios
-import time
 import tty
 from select import select
 

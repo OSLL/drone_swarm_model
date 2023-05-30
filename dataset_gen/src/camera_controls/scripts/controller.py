@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-import re
-import sys
 
 import roslib
 import rospy
@@ -75,7 +73,7 @@ class Handler:
         try:
             self.topic_name = topic + "/cmd_move"
             return self.commands[name]["func"](self, *args)
-        except KeyError as e:
+        except KeyError:
             print(f"Wrong command! - {name}")
             raise AttributeError
 
@@ -155,7 +153,7 @@ if __name__ == "__main__":
                     break
                 try:
                     global_storage.run_command(c, args[0], *map(float, args[1:]))
-                except (AttributeError, TypeError, ValueError, IndexError) as e:
+                except (AttributeError, TypeError, ValueError, IndexError):
                     print("Check commands!")
                     global_storage.help()
     except rospy.ROSInterruptException:

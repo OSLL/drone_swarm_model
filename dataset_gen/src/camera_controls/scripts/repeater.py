@@ -14,7 +14,7 @@ def repeater(inp, out):
         msg.header.stamp = rospy.Time.now()
         pub.publish(msg)
 
-    sub = rospy.Subscriber(inp, Image, callback)
+    rospy.Subscriber(inp, Image, callback)
     rospy.spin()
 
 
