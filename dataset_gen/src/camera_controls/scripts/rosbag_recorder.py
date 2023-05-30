@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
-import sys
-import re
-import subprocess
-import signal
 import os
+import re
+import signal
+import subprocess
+import sys
 import time
-import rospy
-import roslib
-import rosbag
-import rostopic
+
 import message_filters
+import rosbag
+import roslib
+import rospy
+import rostopic
 from std_msgs.msg import String
 
 
@@ -54,7 +55,7 @@ class RosbagProcess:
         while False in self.available_flag:
             if self.timer_count == 0:
                 print("Waiting for ", end="", flush=True)
-                for i in [i for i, e in enumerate(self.available_flag) if e == False]:
+                for i in [i for i, e in enumerate(self.available_flag) if e is False]:
                     if len(self.full_topics_name) == 1:
                         print(self.full_topics_name[0], end=" ", flush=True)
                         break
@@ -66,7 +67,7 @@ class RosbagProcess:
             if self.timer_count == 10:
                 self.timer_count = 0
                 print("There is no publishers for topics: ", end="", flush=True)
-                for i in [i for i, e in enumerate(self.available_flag) if e == False]:
+                for i in [i for i, e in enumerate(self.available_flag) if e is False]:
                     if len(self.full_topics_name) == 1:
                         print(self.full_topics_name[0], end=" ", flush=True)
                         break
@@ -95,7 +96,11 @@ class RosbagProcess:
                 self.start_record()
         elif data.data == "stop record" and self.recording_status:
             self.stop_record()
-        elif re.fullmatch(r'record during \d+', data.data) and not self.during and not self.recording_status:
+        elif (
+            re.fullmatch(r"record during \d+", data.data)
+            and not self.during
+            and not self.recording_status
+        ):
             if self.check_availability_topics():
                 self.during = True
                 time_r = data.data.split()[2]
@@ -137,23 +142,33 @@ class RosbagProcess:
         pub.publish(data2)
 
     def sync_listener(self):
-        self.sync_one = message_filters.Subscriber(f"{self.full_topics_name[0]}", self.msg_types[0])
-        self.sync_two = message_filters.Subscriber(f"{self.full_topics_name[1]}", self.msg_types[1])
-        self.sync_listener_both = message_filters.ApproximateTimeSynchronizer([self.sync_one, self.sync_two], 10, 1, allow_headerless=True)
+        self.sync_one = message_filters.Subscriber(
+            f"{self.full_topics_name[0]}", self.msg_types[0]
+        )
+        self.sync_two = message_filters.Subscriber(
+            f"{self.full_topics_name[1]}", self.msg_types[1]
+        )
+        self.sync_listener_both = message_filters.ApproximateTimeSynchronizer(
+            [self.sync_one, self.sync_two], 10, 1, allow_headerless=True
+        )
         self.sync_listener_both.registerCallback(self.sync_processing_both)
 
     def stop_process(self, process):
-        cmd = subprocess.Popen(f"ps -o pid --ppid {process.pid} --noheaders", stdout=subprocess.PIPE, shell=True)
+        cmd = subprocess.Popen(
+            f"ps -o pid --ppid {process.pid} --noheaders",
+            stdout=subprocess.PIPE,
+            shell=True,
+        )
         cmd_out = cmd.stdout.read()
         code = cmd.wait()
         assert code == 0, f"Cmd return {code}"
-        cmd_out = cmd_out.decode('utf-8')
+        cmd_out = cmd_out.decode("utf-8")
         for pid in cmd_out.split("\n")[:-1]:
             os.kill(int(pid), signal.SIGINT)
         process.terminate()
 
     def listener(self):
-        rospy.init_node('rosbaglistener')
+        rospy.init_node("rosbaglistener")
         rospy.Subscriber("rosbag_command", String, self.processing)
         rosbag.listener_command_line()
         rospy.spin()
@@ -164,7 +179,7 @@ class RosbagProcess:
             self.processing(data)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     try:
         topic_check = sys.argv[1]
         rosbag = RosbagProcess(list(sys.argv[1:]))

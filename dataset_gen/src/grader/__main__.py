@@ -1,14 +1,15 @@
 import json
 import subprocess
 
-from simulator import Simulator
 from performer import Performer
+from simulator import Simulator
+
 
 def main():
     sim = Simulator()
     sim.start()
     with open("/catkin_ws/solution/solution", "r") as solution:
-        code = '\n'.join(solution.readlines())
+        code = "\n".join(solution.readlines())
         performer = Performer(code)
         try:
             performer.perform_solution()
@@ -16,12 +17,8 @@ def main():
             print(e)
 
     with open("/catkin_ws/solution/result", "w") as result:
-        result.write(json.dumps({
-            'correct': 0,
-            'score': 0,
-            'tests': [],
-            'errors': []
-        }))
+        result.write(json.dumps({"correct": 0, "score": 0, "tests": [], "errors": []}))
     sim.end()
+
 
 main()

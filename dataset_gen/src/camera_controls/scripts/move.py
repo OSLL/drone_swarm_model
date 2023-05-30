@@ -1,15 +1,16 @@
 #!/usr/bin/env python
 
 import sys
+
 import rospy
-from tf.transformations import quaternion_from_euler
-from gazebo_msgs.srv import SetModelState
 from gazebo_msgs.msg import ModelState
-from geometry_msgs.msg import Quaternion, Point
+from gazebo_msgs.srv import SetModelState
+from geometry_msgs.msg import Point, Quaternion
+from tf.transformations import quaternion_from_euler
 
 
 def move_client(model_name, position, orientation):
-    sms_service = '/gazebo/set_model_state'
+    sms_service = "/gazebo/set_model_state"
     rospy.wait_for_service(sms_service)
     try:
         sms = rospy.ServiceProxy(sms_service, SetModelState)

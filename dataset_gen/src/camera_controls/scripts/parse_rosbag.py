@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-import sys
 import os
-from bagpy import bagreader
+import sys
+
 import pandas as pd
 import rosbag
+from bagpy import bagreader
 
 
 def extract(bagfile, new_name=""):
@@ -32,11 +33,11 @@ def extract(bagfile, new_name=""):
     print(f"Successfully! Created file {new_name}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     try:
         bagfile = sys.argv[1]
         try:
-            if sys.argv[2] == '-o':
+            if sys.argv[2] == "-o":
                 new_name = sys.argv[3]
                 extract(bagfile, new_name)
                 exit()
@@ -45,5 +46,7 @@ if __name__ == '__main__':
         extract(bagfile)
     except (rosbag.bag.ROSBagException, IndexError, FileNotFoundError):
         print("Check file and arguments!")
-        print("Right command: python3 parse_rosbag.py rosbag_file_name.bag -o name_of_out_file")
+        print(
+            "Right command: python3 parse_rosbag.py rosbag_file_name.bag -o name_of_out_file"
+        )
         print("-o is optional")
