@@ -136,8 +136,8 @@ class GlobalStorage(Handler):
 
     @command("prints help")
     def help(self):
-        for command in self.commands:
-            print(f"{command}: {self.commands[command]['description']}")
+        for command, content in self.commands.items():
+            print(f"{command}: {content['description']}")
 
 
 if __name__ == "__main__":
