@@ -1,6 +1,6 @@
 #! /bin/bash
 
-if [ ! -d "xqueue_watcher" ]; then
+if [ ! -d "xqueue-watcher" ]; then
 	/bin/bash setup.sh
 fi
 

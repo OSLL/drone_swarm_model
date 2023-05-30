@@ -19,7 +19,6 @@ def odometry_processing():
     except rospy.ServiceException as e:
         print("Simulation is not running!")
     odom = '/gazebo/get_model_state'
-    rospy.wait_for_service(odom)
     try:
         odom_s = rospy.ServiceProxy(odom, GetModelState)
         for drone_name in drone_names:
