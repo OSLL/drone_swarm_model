@@ -17,7 +17,7 @@ grader = importlib.import_module("xqueue_watcher.grader")
 ## @brief Class for accepting and checking solutions
 class Grader(grader.Grader):
     def __init__(self, *args, **kwargs) -> None:
-        super(Grader, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._proc = None
         self._solution = ""
 

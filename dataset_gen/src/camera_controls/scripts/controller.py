@@ -70,9 +70,9 @@ class Handler:
         try:
             self.topic_name = topic + "/cmd_move"
             return self.commands[name]["func"](self, *args)
-        except KeyError:
+        except KeyError as exc:
             print(f"Wrong command! - {name}")
-            raise AttributeError
+            raise AttributeError from exc
 
     def publish(self, x, y, z, roll, pitch, yaw):
         pub = rospy.Publisher(self.topic_name, msg_transposition, queue_size=1)

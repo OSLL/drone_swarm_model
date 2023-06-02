@@ -8,7 +8,7 @@ m_x = np.linspace(*x).tolist()
 m_y = np.linspace(*y).tolist()
 m_z = np.linspace(*z).tolist()
 
-list()
+[]
 d = ([], [], [], [])
 
 y_for_1 = m_y[:]

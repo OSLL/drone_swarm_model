@@ -26,7 +26,7 @@ def odometry_processing():
             orientation = drone_state.pose.orientation
             pub = rospy.Publisher(drone_name + "/odom", msg_odometry, queue_size=1)
             pub.publish(orientation.x, orientation.y, orientation.z, orientation.w)
-    except rospy.ServiceException:
+    except rospy.ServiceException as e:
         print(f"Service call failed: {e}")
 
 
