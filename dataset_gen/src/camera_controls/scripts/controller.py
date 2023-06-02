@@ -23,10 +23,9 @@ def odometry_client(model_name):
         position = model_state.pose.position
         orientation = model_state.pose.orientation
         return position, orientation
-    except rospy.ServiceException as e:
-        print(
-            f"Service odometry call failed for drone with name {model_name}: Check drone or simulation!"
-        )
+    except rospy.ServiceException:
+        print(f"Service odometry call failed for drone with name {model_name}: \
+            Check drone or simulation!")
 
 
 def rotate_by_quat(q1, v1):
@@ -59,9 +58,7 @@ def translation_coor(x, y, z, roll, pitch, yaw, pos, quaternion_global):
     # расчет координат для новых
     x, y, z = rotate_by_quat(quaternion_global_new, [x, y, z])[:3]
     # расчет координат для текущей
-    pos.x, pos.y, pos.z = rotate_by_quat(quaternion_global_new, [pos.x, pos.y, pos.z])[
-        :3
-    ]
+    pos.x, pos.y, pos.z = rotate_by_quat(quaternion_global_new, [pos.x, pos.y, pos.z])[:3]
     return x - pos.x, y - pos.y, z - pos.z, roll_local, pitch_local, yaw_local
 
 
@@ -147,14 +144,13 @@ if __name__ == "__main__":
             command = input()
             if len(command) == 0:
                 continue
-            else:
-                c, *args = command.split(" ")
-                if c == "exit":
-                    break
-                try:
-                    global_storage.run_command(c, args[0], *map(float, args[1:]))
-                except (AttributeError, TypeError, ValueError, IndexError):
-                    print("Check commands!")
-                    global_storage.help()
+            c, *args = command.split(" ")
+            if c == "exit":
+                break
+            try:
+                global_storage.run_command(c, args[0], *map(float, args[1:]))
+            except (AttributeError, TypeError, ValueError, IndexError):
+                print("Check commands!")
+                global_storage.help()
     except rospy.ROSInterruptException:
         pass

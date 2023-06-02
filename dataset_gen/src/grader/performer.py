@@ -13,9 +13,7 @@ class Performer:
 
     def get_commands(self, solution):
         parse_solution = re.sub(" +", " ", re.sub("\t+", "", solution)).split("\n")
-        for i in range(len(parse_solution)):
-            parse_solution[i] = parse_solution[i].strip()
-        return parse_solution
+        return [item.strip() for item in parse_solution]
 
     def input_solution(self, solution):
         self.solution = self.get_commands(solution)
@@ -55,7 +53,6 @@ if __name__ == "__main__":
     with open("solution/solution", "r") as f:
         solution = f.read()
     performer = Performer(solution)
-    # performer = Performer("move drone1 0 0 0\nmove_direct     drone1 1.34 3.14 346\n move    drone1 0120 874 1231\n rotate \t\t drone2 1 2 3.5\ntranslate drone1 1 2 3.5  4 5.76 6  ")
     results = {"correct": 0, "score": 0, "tests": [], "errors": []}
     results = json.dumps(results, indent=4)
     performer.perform_solution()

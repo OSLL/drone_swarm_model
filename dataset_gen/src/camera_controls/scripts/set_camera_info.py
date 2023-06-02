@@ -11,16 +11,16 @@ from sensor_msgs.srv import SetCameraInfo
 def loadCalibrationFile(filename):
     ci = CameraInfo()
     try:
-        f = open(filename)
-        calib = yaml.safe_load(f)
-        if calib is not None:
-            ci.width = calib["width"]
-            ci.height = calib["height"]
-            ci.distortion_model = calib["distortion_model"]
-            ci.D = calib["D"]
-            ci.K = calib["K"]
-            ci.R = calib["R"]
-            ci.P = calib["P"]
+        with open(filename) as f:
+            calib = yaml.safe_load(f)
+            if calib is not None:
+                ci.width = calib["width"]
+                ci.height = calib["height"]
+                ci.distortion_model = calib["distortion_model"]
+                ci.D = calib["D"]
+                ci.K = calib["K"]
+                ci.R = calib["R"]
+                ci.P = calib["P"]
 
     except IOError:  # OK if file did not exist
         pass
@@ -48,6 +48,6 @@ if __name__ == "__main__":
         print(usage())
         sys.exit(1)
     cname = sys.argv[1]
-    camera_info = sys.argv[2]    
+    camera_info = sys.argv[2]
     res = set_camera_info_client(cname, camera_info)
     print(res)

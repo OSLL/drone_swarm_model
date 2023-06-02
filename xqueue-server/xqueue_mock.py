@@ -32,7 +32,11 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200)
         self.end_headers()
-        solution = "move drone1 0 0 0\nmove_direct     drone1 1.34 3.14 346\n move    drone2 0120 874 1231\n rotate \t\t drone2 1 2 3.5\ntranslate drone1 1 2 3.5  4 5.76 6  "
+        solution = "move drone1 0 0 0\n\
+        move_direct     drone1 1.34 3.14 346\n\
+        move    drone2 0120 874 1231\n\
+        rotate \t\t drone2 1 2 3.5\n\
+        translate drone1 1 2 3.5  4 5.76 6  "
         self.wfile.write(json.dumps(get_response(solution)).encode())
 
     def do_POST(self):

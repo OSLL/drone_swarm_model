@@ -25,7 +25,7 @@ def wait_for_gazebo():
             gwp = rospy.ServiceProxy("gazebo/get_world_properties", GetWorldProperties)
             world_properties = gwp()
             return world_properties
-        except rospy.ServiceException as e:
+        except rospy.ServiceException:
             print("Simulation is not running")
             time.sleep(1)
         except (rospy.ROSInterruptException, TypeError):
@@ -38,10 +38,9 @@ def wait_for_drone(world_properties, drone_name):
         if world_properties.success:
             if drone_name in world_properties.model_names:
                 return
-            else:
-                print(world_properties.model_names)
-                print(f"Drone named '{drone_name}' is not on the map")
-                time.sleep(1)
+            print(world_properties.model_names)
+            print(f"Drone named '{drone_name}' is not on the map")
+            time.sleep(1)
 
 
 # Поворот вектора на кватернион

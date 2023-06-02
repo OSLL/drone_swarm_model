@@ -40,7 +40,7 @@ if __name__ == "__main__":
             if sys.argv[2] == "-o":
                 new_name = sys.argv[3]
                 extract(bagfile, new_name)
-                exit()
+                sys.exit()
         except IndexError:
             pass
         extract(bagfile)

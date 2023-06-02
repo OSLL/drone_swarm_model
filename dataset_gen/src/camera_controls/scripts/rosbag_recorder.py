@@ -42,9 +42,9 @@ class RosbagProcess:
         self.special_topic_name2 = "/rosbag_sync_topic2"
 
     def check_availability_topics(self):
-        for i in range(len(self.full_topics_name)):
+        for i, topic_name in enumerate(self.full_topics_name):
             try:
-                rostopic.get_info_text(self.full_topics_name[i])
+                rostopic.get_info_text(topic_name)
                 self.available_flag[i] = True
                 if len(self.full_topics_name) == 1:
                     self.available_flag[1] = True
@@ -59,8 +59,7 @@ class RosbagProcess:
                     if len(self.full_topics_name) == 1:
                         print(self.full_topics_name[0], end=" ", flush=True)
                         break
-                    else:
-                        print(self.full_topics_name[i], end=" ", flush=True)
+                    print(self.full_topics_name[i], end=" ", flush=True)
                 print("publishers", end="", flush=True)
             print(".", end="", flush=True)
             self.timer_count += 1
@@ -71,16 +70,15 @@ class RosbagProcess:
                     if len(self.full_topics_name) == 1:
                         print(self.full_topics_name[0], end=" ", flush=True)
                         break
-                    else:
-                        print(self.full_topics_name[i], end=" ", flush=True)
+                    print(self.full_topics_name[i], end=" ", flush=True)
                 print()
                 if self.first_time:
-                    exit()
+                    sys.exit()
                 return False
             time.sleep(1)
-            for i in range(len(self.full_topics_name)):
+            for i, topic_name in enumerate(self.full_topics_name):
                 try:
-                    rostopic.get_info_text(self.full_topics_name[i])
+                    rostopic.get_info_text(topic_name)
                     self.available_flag[i] = True
                     if len(self.full_topics_name) == 1:
                         self.available_flag[1] = True

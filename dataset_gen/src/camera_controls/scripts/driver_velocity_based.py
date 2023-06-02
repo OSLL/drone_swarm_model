@@ -42,9 +42,7 @@ class RobotState:
 def rotate_by_quaternion(q1, v1):
     q2 = v1 + [0]
 
-    return quaternion_multiply(quaternion_multiply(q1, q2), quaternion_conjugate(q1))[
-        0:3
-    ]
+    return quaternion_multiply(quaternion_multiply(q1, q2), quaternion_conjugate(q1))[0:3]
 
 
 # Проверяем, запущена ли симуляция и есть ли в мире дрон с именем drone_name
@@ -55,11 +53,9 @@ def is_drone_is_simulation_running(drone_name):
         if world_properties.success:
             if drone_name in world_properties.model_names:
                 return True, ""
-            else:
-                return False, f"Drone named '{drone_name}' is not on the map"
-        else:
-            return False, "Simulation is not running"
-    except rospy.ServiceException as e:
+            return False, f"Drone named '{drone_name}' is not on the map"
+        return False, "Simulation is not running"
+    except rospy.ServiceException:
         return False, "Simulation is not running"
 
 
