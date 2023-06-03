@@ -29,7 +29,7 @@ def wait_for_gazebo():
             print("Simulation is not running")
             time.sleep(1)
         except (rospy.ROSInterruptException, TypeError):
-            break
+            return None
 
 
 # Определяем, есть ли дрон с именем drone_name на карте
@@ -105,6 +105,7 @@ def get_drone_location(drone_name):
         return position, orientation
     except rospy.ServiceException as e:
         print(f"Service call failed: {e}")
+        return None
 
 
 # Телепортация дрона в глобальной системе координат
@@ -124,6 +125,7 @@ def teleport_drone(data, drone_name):
         return sms(state)
     except rospy.ServiceException as e:
         print(f"Service call failed: {e}")
+        return None
 
 
 def listener():

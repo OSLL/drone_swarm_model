@@ -25,7 +25,8 @@ class Grader(grader.Grader):
     # @param[in] grader_path path to wanted grader (unused)
     # @param[in] grader_config JSON object with "grader_payload"
     # @param[in] student_response JSON object with "student_response"
-    def grade(self, grader_path, grader_config, student_response):
+    def grade(self, _grader_path, _grader_config, _student_response):
+        # consider removing prefix underscores for arguments that are going to be used
         # task_id = grader_config["task_id"]
         results = {}
         checker = PrimitiveChecker()
@@ -100,6 +101,7 @@ class Grader(grader.Grader):
             if queue:
                 queue.put(reply)
             return reply
+        return None
 
     def _start_container(self, init_time: int = 5):
         if self._proc is None:
@@ -110,7 +112,7 @@ class Grader(grader.Grader):
                 time.sleep(init_time)
 
     def _exec_simulation_container(self):
-        with open("solution/solution", "w") as solution_file:
+        with open("solution/solution", "w", encoding="utf-8") as solution_file:
             solution_file.write(self._solution)
         subprocess.Popen(["docker", "exec", "-it", "dataset_gen", "bash"])
 
@@ -124,7 +126,7 @@ class Grader(grader.Grader):
                 break
         if timeout_flag:
             return results
-        with open("solution/result", "r") as result_file:
+        with open("solution/result", "r", encoding="utf-8") as result_file:
             results = json.loads("\n".join(result_file.readlines()))
             print(results)
         os.remove("solution/result")

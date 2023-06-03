@@ -16,7 +16,7 @@ def odometry_processing():
             drone_names = list(filter(lambda x: "drone" in x, properties.model_names))
         else:
             print("Simulation is not running!")
-    except rospy.ServiceException as e:
+    except rospy.ServiceException:
         print("Simulation is not running!")
     odom = "/gazebo/get_model_state"
     try:

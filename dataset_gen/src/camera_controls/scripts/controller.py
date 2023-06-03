@@ -14,8 +14,8 @@ from tf.transformations import (
 
 
 def odometry_client(model_name):
-    odom = "/gazebo/get_model_state"
     try:
+        odom = "/gazebo/get_model_state"
         odom_s = rospy.ServiceProxy(odom, GetModelState)
         model_state = odom_s(model_name, "")
         if model_state.success is False:
@@ -26,6 +26,7 @@ def odometry_client(model_name):
     except rospy.ServiceException:
         print(f"Service odometry call failed for drone with name {model_name}: \
             Check drone or simulation!")
+        return None
 
 
 def rotate_by_quat(q1, v1):

@@ -105,7 +105,7 @@ def main(args):
     if args.output is None:
         print_trajectory(trajectory)
     else:
-        with open(args.output, "w") as file:
+        with open(args.output, "w", encoding="utf-8") as file:
             print_trajectory(trajectory, file)
 
 
@@ -113,14 +113,15 @@ def reference_trajectory(reference_path, delta, angle_delta):
     """Generate similar trajectory based on reference."""
 
     trajectory = []
-    for line in open(reference_path):
-        reference = list(map(float, line.split()))
-        pos = reference[:3]
-        rot = reference[3:]
-        point = [x + np.random.uniform(-delta, delta) for x in pos] + [
-            x + np.random.uniform(-angle_delta, angle_delta) for x in rot
-        ]
-        trajectory.append(point)
+    with open(reference_path, encoding="utf-8") as file:
+        for line in file:
+            reference = list(map(float, line.split()))
+            pos = reference[:3]
+            rot = reference[3:]
+            point = [x + np.random.uniform(-delta, delta) for x in pos] + [
+                x + np.random.uniform(-angle_delta, angle_delta) for x in rot
+            ]
+            trajectory.append(point)
     return trajectory
 
 

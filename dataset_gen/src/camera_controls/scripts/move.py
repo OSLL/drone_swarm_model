@@ -25,6 +25,7 @@ def move_client(model_name, position, orientation):
         return sms(state)
     except rospy.ServiceException as e:
         print(f"Service call failed: {e}")
+        return None
 
 
 def usage():

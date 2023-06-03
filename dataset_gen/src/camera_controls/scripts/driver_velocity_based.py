@@ -76,6 +76,7 @@ def get_drone_location(drone_name):
         return position, orientation
     except rospy.ServiceException as e:
         print(f"Service call failed: {e}")
+        return None
 
 
 # Изменение координат робота в соответствии с содержимым msg
@@ -114,6 +115,7 @@ def teleport_drone(robot_pos, robot_dir, drone_name):
         return sms(state)
     except rospy.ServiceException as e:
         print(f"Service call failed: {e}")
+        return None
 
 
 # Функция обработки сообщений

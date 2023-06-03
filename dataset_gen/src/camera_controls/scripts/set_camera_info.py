@@ -11,7 +11,7 @@ from sensor_msgs.srv import SetCameraInfo
 def loadCalibrationFile(filename):
     ci = CameraInfo()
     try:
-        with open(filename) as f:
+        with open(filename, encoding="utf-8") as f:
             calib = yaml.safe_load(f)
             if calib is not None:
                 ci.width = calib["width"]
@@ -37,6 +37,7 @@ def set_camera_info_client(cname, filename):
         return sci(camera_info)
     except rospy.ServiceException as e:
         print(f"Service call failed: {e}")
+        return None
 
 
 def usage():

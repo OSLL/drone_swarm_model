@@ -9,7 +9,8 @@ class Performer:
     _base_time_wait = 3
 
     def __init__(self, solution):
-        self.commands = self.input_solution(solution)
+        self.input_solution(solution)
+        self.commands = self.solution
 
     def get_commands(self, solution):
         parse_solution = re.sub(" +", " ", re.sub("\t+", "", solution)).split("\n")
@@ -29,10 +30,11 @@ class Performer:
             + str(len(drone_names))
             + " > src/simulation/launch/sim.launch",
             shell=True,
+            check=False
         )
         if result.returncode:
             raise Exception("Trouble to create launch file")
-        proc_sim = subprocess.Popen("roslaunch simulation sim.launch", shell=True)
+        subprocess.Popen("roslaunch simulation sim.launch", shell=True)
         time.sleep(self._base_time_wait + int(0.5 * len(drone_names)))
         driver_proc = []
         for i in drone_names:
@@ -50,11 +52,11 @@ class Performer:
 
 if __name__ == "__main__":
     print("performer started")
-    with open("solution/solution", "r") as f:
+    with open("solution/solution", "r", encoding="utf-8") as f:
         solution = f.read()
     performer = Performer(solution)
     results = {"correct": 0, "score": 0, "tests": [], "errors": []}
     results = json.dumps(results, indent=4)
     performer.perform_solution()
-    with open("solution/result", "w") as f:
+    with open("solution/result", "w", encoding="utf-8") as f:
         f.write(results)

@@ -4,9 +4,9 @@
 ## Unit tests for primitive_checker
 
 import sys
-
-sys.path.append("..")
 from primitive_checker import PrimitiveChecker
+sys.path.append("..")
+
 
 empty_code = ["", "\t\t   \t\r\n      \r   \n\r"]
 

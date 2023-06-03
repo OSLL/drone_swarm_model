@@ -39,9 +39,9 @@ def model_file(model=None):
 def create_drones(num, basename="drone"):
     result = (
         f"""
-        <group ns="drone{i}">
+        <group ns="{basename}{i}">
             <include file="$(find camera_controls)/launch/spawn_camera.launch">
-            <arg name="model_name" value="drone{i}" />
+            <arg name="model_name" value="{basename}{i}" />
             </include>
         </group>
         """

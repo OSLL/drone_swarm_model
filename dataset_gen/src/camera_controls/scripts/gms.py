@@ -25,6 +25,7 @@ def gms_client(model_name, relative_entity_name):
         return position, orientation
     except rospy.ServiceException as e:
         print(f"Service call failed: {e}")
+        return None
 
 
 def usage():
