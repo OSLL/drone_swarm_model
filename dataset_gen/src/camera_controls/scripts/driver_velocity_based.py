@@ -1,15 +1,20 @@
 #!/usr/bin/env python3
+import time
+
 import roslib
 import rospy
-import sys
-import time
-from std_msgs.msg import String
-from camera_controls.msg import msg_transposition
-from tf.transformations import quaternion_from_euler, euler_from_quaternion, quaternion_multiply, quaternion_conjugate, \
-    unit_vector
 from gazebo_msgs.msg import ModelState
-from geometry_msgs.msg import Quaternion, Point
-from gazebo_msgs.srv import SetModelState, GetModelState, GetWorldProperties
+from gazebo_msgs.srv import GetModelState, GetWorldProperties, SetModelState
+from geometry_msgs.msg import Point, Quaternion
+from std_msgs.msg import String
+from tf.transformations import (
+    euler_from_quaternion,
+    quaternion_conjugate,
+    quaternion_from_euler,
+    quaternion_multiply,
+    unit_vector,
+)
+from camera_controls.msg import msg_transposition
 
 
 # Класс сообщения, которое получает драйвер
@@ -37,43 +42,41 @@ class RobotState:
 def rotate_by_quaternion(q1, v1):
     q2 = v1 + [0]
 
-    return quaternion_multiply(
-        quaternion_multiply(q1, q2),
-        quaternion_conjugate(q1)
-    )[0:3]
+    return quaternion_multiply(quaternion_multiply(q1, q2), quaternion_conjugate(q1))[0:3]
 
 
 # Проверяем, запущена ли симуляция и есть ли в мире дрон с именем drone_name
 def is_drone_is_simulation_running(drone_name):
     try:
-        gwp = rospy.ServiceProxy('gazebo/get_world_properties', GetWorldProperties)
+        gwp = rospy.ServiceProxy("gazebo/get_world_properties", GetWorldProperties)
         world_properties = gwp()
         if world_properties.success:
             if drone_name in world_properties.model_names:
-                return True, ''
-            else:
-                return False, f'Drone named \'{drone_name}\' is not on the map'
-        else:
-            return False, 'Simulation is not running'
-    except rospy.ServiceException as e:
-        return False, 'Simulation is not running'
+                return True, ""
+            return False, f"Drone named '{drone_name}' is not on the map"
+        return False, "Simulation is not running"
+    except rospy.ServiceException:
+        return False, "Simulation is not running"
 
 
 # Получить текущее положение робота до начала перемещения
 def get_drone_location(drone_name):
-    rospy.wait_for_service('gazebo/get_model_state')
+    rospy.wait_for_service("gazebo/get_model_state")
     try:
-        gms = rospy.ServiceProxy('gazebo/get_model_state', GetModelState)
-        model_state = gms(drone_name, '')
+        gms = rospy.ServiceProxy("gazebo/get_model_state", GetModelState)
+        model_state = gms(drone_name, "")
         position = model_state.pose.position
-        orientation = [model_state.pose.orientation.x,
-                       model_state.pose.orientation.y,
-                       model_state.pose.orientation.z,
-                       model_state.pose.orientation.w]
+        orientation = [
+            model_state.pose.orientation.x,
+            model_state.pose.orientation.y,
+            model_state.pose.orientation.z,
+            model_state.pose.orientation.w,
+        ]
 
         return position, orientation
     except rospy.ServiceException as e:
         print(f"Service call failed: {e}")
+        return None
 
 
 # Изменение координат робота в соответствии с содержимым msg
@@ -81,7 +84,9 @@ def coordinate_transformation(robot_pos, robot_dir, msg):
     # Величины, на которые изменятся координаты дрона
     delta_pos = [x / 60 for x in [msg.x, msg.y, msg.z]]
     # Величины, на которые изменятся углы дрона
-    delta_angle = quaternion_from_euler(*[x / 60 for x in [msg.roll, msg.pitch, msg.yaw]])
+    delta_angle = quaternion_from_euler(
+        *[x / 60 for x in [msg.roll, msg.pitch, msg.yaw]]
+    )
 
     # Изменение координат дрона
     delta_pos = rotate_by_quaternion(robot_dir, delta_pos)
@@ -97,9 +102,9 @@ def coordinate_transformation(robot_pos, robot_dir, msg):
 
 # Телепортация дрона в глобальной системе координат
 def teleport_drone(robot_pos, robot_dir, drone_name):
-    rospy.wait_for_service('gazebo/set_model_state')
+    rospy.wait_for_service("gazebo/set_model_state")
     try:
-        sms = rospy.ServiceProxy('gazebo/set_model_state', SetModelState)
+        sms = rospy.ServiceProxy("gazebo/set_model_state", SetModelState)
         state = ModelState()
         state.model_name = drone_name
 
@@ -110,6 +115,7 @@ def teleport_drone(robot_pos, robot_dir, drone_name):
         return sms(state)
     except rospy.ServiceException as e:
         print(f"Service call failed: {e}")
+        return None
 
 
 # Функция обработки сообщений
@@ -121,12 +127,12 @@ def listener():
     # Создание экземпляра сообщения
     msg = RobotState()
     # Если не указан параметр __name, то имя ноды по умолчанию -- 'driver'
-    rospy.init_node('driver')
+    rospy.init_node("driver")
 
     # Имя дрона без слеша (e.g. 'drone1')
     drone_name = rospy.get_name()[1:]
 
-    rospy.Subscriber(f'{drone_name}/cmd_vel', msg_transposition, cmd_vel_event, msg)
+    rospy.Subscriber(f"{drone_name}/cmd_vel", msg_transposition, cmd_vel_event, msg)
 
     is_drone_prev = False
     while not rospy.is_shutdown():
@@ -134,16 +140,18 @@ def listener():
         # Если симуляция запущена и дрон с именем drone_name есть на карте, то перемещаем его
         if is_drone:
             if is_drone and not is_drone_prev:
-                print(f'\'{drone_name}\' driver ready to receive messages')
+                print(f"'{drone_name}' driver ready to receive messages")
             try:
                 now = time.time()
                 robot_pos, robot_dir = get_drone_location(drone_name)
-                robot_pos, robot_dir = coordinate_transformation(robot_pos, robot_dir, msg)
+                robot_pos, robot_dir = coordinate_transformation(
+                    robot_pos, robot_dir, msg
+                )
                 teleport_drone(robot_pos, robot_dir, drone_name)
                 delta_time = time.time() - now
                 rospy.sleep(1 / 60 - delta_time)
             except (rospy.ROSInterruptException, TypeError):
-                rospy.signal_shutdown('Done')
+                rospy.signal_shutdown("Done")
         else:
             print(err)
             time.sleep(1)

@@ -1,15 +1,16 @@
 #!/usr/bin/env python
 
 import sys
+
 import rospy
-from tf.transformations import quaternion_from_euler
-from gazebo_msgs.srv import SetModelState
 from gazebo_msgs.msg import ModelState
-from geometry_msgs.msg import Quaternion, Point
+from gazebo_msgs.srv import SetModelState
+from geometry_msgs.msg import Point, Quaternion
+from tf.transformations import quaternion_from_euler
 
 
 def move_client(model_name, position, orientation):
-    sms_service = '/gazebo/set_model_state'
+    sms_service = "/gazebo/set_model_state"
     rospy.wait_for_service(sms_service)
     try:
         sms = rospy.ServiceProxy(sms_service, SetModelState)
@@ -24,6 +25,7 @@ def move_client(model_name, position, orientation):
         return sms(state)
     except rospy.ServiceException as e:
         print(f"Service call failed: {e}")
+        return None
 
 
 def usage():
@@ -31,12 +33,11 @@ def usage():
 
 
 if __name__ == "__main__":
-    if len(sys.argv) == 8:
-        model_name = sys.argv[1]
-        x, y, z, roll, pitch, yaw = map(float, sys.argv[2:])
-    else:
+    if len(sys.argv) != 8:
         print(usage())
         sys.exit(1)
+    model_name = sys.argv[1]
+    x, y, z, roll, pitch, yaw = map(float, sys.argv[2:])
     print(f"Moving {model_name} to XYZ=({x},{y},{z}), RPY=({roll},{pitch},{yaw})")
     res = move_client(model_name, (x, y, z), (roll, pitch, yaw))
     print(res)

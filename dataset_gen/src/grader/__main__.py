@@ -1,27 +1,23 @@
 import json
-import subprocess
 
-from simulator import Simulator
 from performer import Performer
+from simulator import Simulator
+
 
 def main():
     sim = Simulator()
     sim.start()
-    with open("/catkin_ws/solution/solution", "r") as solution:
-        code = '\n'.join(solution.readlines())
+    with open("/catkin_ws/solution/solution", "r", encoding="utf-8") as solution:
+        code = "\n".join(solution.readlines())
         performer = Performer(code)
         try:
             performer.perform_solution()
-        except Exception as e:
-            print(e)
+        except RuntimeError as re:
+            print(f"perform_solution() error: {re}")
 
-    with open("/catkin_ws/solution/result", "w") as result:
-        result.write(json.dumps({
-            'correct': 0,
-            'score': 0,
-            'tests': [],
-            'errors': []
-        }))
+    with open("/catkin_ws/solution/result", "w", encoding="utf-8") as result:
+        result.write(json.dumps({"correct": 0, "score": 0, "tests": [], "errors": []}))
     sim.end()
+
 
 main()

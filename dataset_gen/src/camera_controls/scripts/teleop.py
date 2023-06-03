@@ -1,32 +1,37 @@
 #!/usr/bin/env python3
-import roslib
-import rospy
+import subprocess
 import sys
-import time
-from std_msgs.msg import String
-from camera_controls.msg import msg_transposition
-from tf.transformations import quaternion_from_euler, euler_from_quaternion, quaternion_multiply, quaternion_conjugate, \
-    unit_vector
-from gazebo_msgs.msg import ModelState
-from geometry_msgs.msg import Quaternion, Point
-from gazebo_msgs.srv import SetModelState, GetModelState, GetWorldProperties
-from select import select
 import termios
 import tty
-import subprocess
+from select import select
+
+import roslib
 import rosnode
+import rospy
+from gazebo_msgs.msg import ModelState
+from gazebo_msgs.srv import GetModelState, GetWorldProperties, SetModelState
+from geometry_msgs.msg import Point, Quaternion
+from std_msgs.msg import String
+from tf.transformations import (
+    euler_from_quaternion,
+    quaternion_conjugate,
+    quaternion_from_euler,
+    quaternion_multiply,
+    unit_vector,
+)
+from camera_controls.msg import msg_transposition
 
 
 # Проверяем начилие драйвер для дрона drone_name
 def wait_for_subcriber(drone_name):
-    drone_name = '/' + drone_name
+    drone_name = "/" + drone_name
     find = False
     while not find:
         for node in rosnode.get_node_names():
             if drone_name == node:
                 find = True
                 break
-        print(f'No driver found for the drone named \'{drone_name[1:]}\'')
+        print(f"No driver found for the drone named '{drone_name[1:]}'")
         rospy.sleep(1)
 
 
@@ -39,7 +44,7 @@ def getKey(settings, timeout):
     if rlist:
         key = sys.stdin.read(1)
     else:
-        key = ''
+        key = ""
     termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
     return key
 
@@ -92,16 +97,19 @@ class RobotState:
     def decrease_yaw(self):
         self.yaw -= self.delta
 
+
 # Конвертация дробного числа в строку для отображения в консоли
 def float_to_string(num):
-    sign = '+'
+    sign = "+"
     if num < 0:
-        sign = ''
-    return sign + f'{num:.4f}'
+        sign = ""
+    return sign + f"{num:.4f}"
+
 
 # Печать пользовательствого интерфейса в консоли
 def print_UI(msg):
-    print(f"""                                                              U
+    print(
+        f"""                                                              U
                      B    W                                   ↑ 
            [{float_to_string(msg.z)}] |   / [{float_to_string(msg.x)}]                         |│  /
                      |  /                      [{float_to_string(msg.yaw)}] O ←──┘ / 
@@ -113,7 +121,8 @@ def print_UI(msg):
                   /  |                                    /│ |                
                  /   |                                   / ↓ |                
                 S  SPACE                                   L
-                """)
+                """
+    )
 
 
 def talker():
@@ -122,50 +131,50 @@ def talker():
     settings = termios.tcgetattr(sys.stdin)
     key_timeout = 0.5
 
-    hot_keys = {'w': lambda message: message.increase_x(),
-                's': lambda message: message.decrease_x(),
-                'd': lambda message: message.increase_y(),
-                'a': lambda message: message.decrease_y(),
-                'b': lambda message: message.increase_z(),
-                ' ': lambda message: message.decrease_z(),
-                'i': lambda message: message.increase_pitch(),
-                'k': lambda message: message.decrease_pitch(),
-                'l': lambda message: message.increase_roll(),
-                'j': lambda message: message.decrease_roll(),
-                'o': lambda message: message.increase_yaw(),
-                'u': lambda message: message.decrease_yaw()}
+    hot_keys = {
+        "w": lambda message: message.increase_x(),
+        "s": lambda message: message.decrease_x(),
+        "d": lambda message: message.increase_y(),
+        "a": lambda message: message.decrease_y(),
+        "b": lambda message: message.increase_z(),
+        " ": lambda message: message.decrease_z(),
+        "i": lambda message: message.increase_pitch(),
+        "k": lambda message: message.decrease_pitch(),
+        "l": lambda message: message.increase_roll(),
+        "j": lambda message: message.decrease_roll(),
+        "o": lambda message: message.increase_yaw(),
+        "u": lambda message: message.decrease_yaw(),
+    }
 
-    rospy.init_node('teleop')
+    rospy.init_node("teleop")
 
-    topic_name = rospy.get_param('~topic')
+    topic_name = rospy.get_param("~topic")
 
     # Имя дрона без слеша (e.g. 'drone1')
     drone_name = topic_name[1:-8]
     # Ожидаем запуск драйвера для дрона
 
-
     wait_for_subcriber(drone_name)
-
 
     pub = rospy.Publisher(topic_name, msg_transposition, queue_size=4)
 
-    subprocess.call('clear', stdin=True, shell=True)
-    print(f'Driver for drone \'{drone_name}\' found')
+    subprocess.call("clear", stdin=True, shell=True)
+    print(f"Driver for drone '{drone_name}' found")
     print_UI(msg)
 
     while not rospy.is_shutdown():
         key = getKey(settings, key_timeout)
-        if key == '\x03':
+        if key == "\x03":
             sys.exit(0)
         if key:
-            subprocess.call('clear', stdin=True, shell=True)
+            subprocess.call("clear", stdin=True, shell=True)
             if key in hot_keys:
                 hot_keys[key](msg)
                 print_UI(msg)
                 pub.publish(msg.x, msg.y, msg.z, msg.roll, msg.pitch, msg.yaw)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     try:
         talker()
     except rospy.ROSInterruptException:

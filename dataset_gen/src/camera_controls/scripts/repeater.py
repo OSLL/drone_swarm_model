@@ -1,19 +1,20 @@
 #!/usr/bin/env python
 
-from sensor_msgs.msg import Image
-import rospy
 import sys
+
+import rospy
+from sensor_msgs.msg import Image
 
 
 def repeater(inp, out):
-    rospy.init_node('repeater')
+    rospy.init_node("repeater")
     pub = rospy.Publisher(out, Image, queue_size=10)
 
     def callback(msg):
         msg.header.stamp = rospy.Time.now()
         pub.publish(msg)
 
-    sub = rospy.Subscriber(inp, Image, callback)
+    rospy.Subscriber(inp, Image, callback)
     rospy.spin()
 
 
