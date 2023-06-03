@@ -2,6 +2,7 @@
 import re
 import subprocess
 import time
+import json
 
 
 class Performer:
@@ -33,7 +34,7 @@ class Performer:
             check=False
         )
         if result.returncode:
-            raise Exception("Trouble to create launch file")
+            raise RuntimeError("Trouble to create launch file")
         subprocess.Popen("roslaunch simulation sim.launch", shell=True)
         time.sleep(self._base_time_wait + int(0.5 * len(drone_names)))
         driver_proc = []

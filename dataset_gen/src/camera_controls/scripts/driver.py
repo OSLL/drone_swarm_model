@@ -29,7 +29,8 @@ def wait_for_gazebo():
             print("Simulation is not running")
             time.sleep(1)
         except (rospy.ROSInterruptException, TypeError):
-            return None
+            break
+    return None
 
 
 # Определяем, есть ли дрон с именем drone_name на карте

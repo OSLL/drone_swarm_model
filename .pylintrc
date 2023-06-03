@@ -429,6 +429,7 @@ disable=raw-checker-failed,
         useless-suppression,
         deprecated-pragma,
         use-symbolic-message-instead,
+        
         import-error,
         no-name-in-module,
         invalid-name,
@@ -438,7 +439,9 @@ disable=raw-checker-failed,
         unused-import,
         import-outside-toplevel,
         duplicate-code,
-        redefined-outer-name
+        redefined-outer-name,
+        consider-using-with,
+        broad-exception-caught
         
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option

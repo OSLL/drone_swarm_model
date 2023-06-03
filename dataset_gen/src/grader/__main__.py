@@ -12,8 +12,8 @@ def main():
         performer = Performer(code)
         try:
             performer.perform_solution()
-        except Exception as e:
-            print(e)
+        except RuntimeError as re:
+            print(f"perform_solution() error: {re}")
 
     with open("/catkin_ws/solution/result", "w", encoding="utf-8") as result:
         result.write(json.dumps({"correct": 0, "score": 0, "tests": [], "errors": []}))
