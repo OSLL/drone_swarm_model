@@ -2,7 +2,6 @@
 
 import roslib
 import rospy
-from camera_controls.msg import msg_transposition
 from gazebo_msgs.srv import GetModelState
 from std_msgs.msg import String
 from tf.transformations import (
@@ -11,6 +10,7 @@ from tf.transformations import (
     quaternion_from_euler,
     quaternion_multiply,
 )
+from camera_controls.msg import msg_transposition
 
 
 def odometry_client(model_name):

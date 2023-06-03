@@ -3,8 +3,8 @@ import time
 
 import roslib
 import rospy
-from camera_controls.msg import msg_odometry, msg_transposition
 from gazebo_msgs.srv import GetModelState, GetWorldProperties
+from camera_controls.msg import msg_odometry, msg_transposition
 
 
 def odometry_processing():

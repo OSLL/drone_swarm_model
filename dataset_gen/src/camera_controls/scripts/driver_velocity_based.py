@@ -3,7 +3,6 @@ import time
 
 import roslib
 import rospy
-from camera_controls.msg import msg_transposition
 from gazebo_msgs.msg import ModelState
 from gazebo_msgs.srv import GetModelState, GetWorldProperties, SetModelState
 from geometry_msgs.msg import Point, Quaternion
@@ -15,6 +14,7 @@ from tf.transformations import (
     quaternion_multiply,
     unit_vector,
 )
+from camera_controls.msg import msg_transposition
 
 
 # Класс сообщения, которое получает драйвер
